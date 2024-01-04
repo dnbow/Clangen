@@ -14,7 +14,7 @@ namespace Clangen
             gameState.Load();
             gameState.Finalise();
 
-            gameState.SetScreen(gameState.Screens[0]);
+            gameState.SetScreen(gameState.Screens["Menu"]);
 
             gameState.isRunning = true;
 

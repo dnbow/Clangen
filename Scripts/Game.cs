@@ -1,8 +1,10 @@
-﻿using ClangenNET.UI;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
+using Clangen.UI;
+using Clangen.Cats;
 
 namespace Clangen
 {
@@ -28,10 +30,10 @@ namespace Clangen
     }
     public class ThemeState
     {
-        public bool IsDarkMode;
+        public bool IsDarkMode = false;
 
-        public Color BackgroundLight = new Color(255, 255, 255);
-        public Color BackgroundDark = new Color(0, 0, 0);
+        public Color BackgroundLight = new Color(206, 194, 168);
+        public Color BackgroundDark = new Color(57, 50, 36);
 
         public Color Background => IsDarkMode ? BackgroundDark : BackgroundLight;
     }
@@ -49,15 +51,16 @@ namespace Clangen
         public bool isRunning = false;
         public bool isFullscreen = false;
 
-        public int ScreenWidth  { get; set; } = 640;
-        public int ScreenHeight { get; set; } = 480;
+        public int ScreenWidth  { get; set; } = 800;
+        public int ScreenHeight { get; set; } = 700;
 
-        public List<BaseScreen> Screens = new List<BaseScreen>();
+        public Dictionary<string, BaseScreen> Screens = new Dictionary<string, BaseScreen>();
         public BaseScreen CurrentScreen;
         public BaseScreen LastScreen;
 
-
         public List<BaseElement> HoveredElements = new List<BaseElement>();
+
+        public Clan CurrentClan;
 
 
         public GameState() { 
@@ -95,7 +98,6 @@ namespace Clangen
                 return 13;
             }
 
-            SDL_SetRenderDrawColor(Renderer, 135, 206, 235, 255);
             return 0;
         }
 
@@ -110,9 +112,15 @@ namespace Clangen
 
         public int Finalise()
         {
-            Screens = new List<BaseScreen> {
-                new ClangenNET.Screens.StartScreen()
-            };
+            foreach (
+                var Screen in AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(assembly => assembly.GetTypes())
+                    .Where(type => type.IsSubclassOf(typeof(BaseScreen)))
+                    .Select(type => Activator.CreateInstance(type) as BaseScreen)
+                    )
+                Screens[Screen.GetType().Name] = Screen;
+            
+
             return 0;
         }
 
@@ -162,11 +170,14 @@ namespace Clangen
                         break;
 
                     case SDL_EventType.SDL_KEYUP:
+                        break;
+
+                    case SDL_EventType.SDL_KEYDOWN:
                         switch (Event.key.keysym.sym)
                         {
                             case SDL_Keycode.SDLK_F10: // Toggle darkmode
                                 Theme.IsDarkMode = !Theme.IsDarkMode;
-                                RenderState |= 1;
+                                RenderState |= 2;
                                 break;
 
                             case SDL_Keycode.SDLK_F11:
@@ -184,14 +195,12 @@ namespace Clangen
                                     SDL_LockSurface(Screenshot);
                                     SDL_RenderReadPixels(SDL_GetRenderer(Window), ref rect, ((SDL_PixelFormat*)(Surface->format))->format, Surface->pixels, Surface->pitch);
                                     SDL_UnlockSurface(Screenshot);
+                                    IMG_SavePNG(Screenshot, $"Screenshots\\{DateTime.Now.Ticks}.png");
                                     SDL_FreeSurface(Screenshot);
                                 }
                                 break;
                                 
                         }
-                        break;
-
-                    case SDL_EventType.SDL_KEYDOWN:
                         break;
 
                     case SDL_EventType.SDL_MOUSEMOTION:
@@ -228,17 +237,25 @@ namespace Clangen
                         break;
 
                     case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                        if (Event.button.button == SDL_BUTTON_LEFT)
-				            CurrentScreen.OnClick(this);
-
                         for (int i = 0; i < HoveredElements.Count; i++)
                         {
                             var Element = HoveredElements[i];
-                            if (Element.OnClick != null)
+                            if (Element.OnClick != null && Element.Enabled)
                                 Element.OnClick(this);
                         }
 
 			            break;
+
+                    case SDL_EventType.SDL_MOUSEBUTTONUP:
+                        for (int i = 0; i < HoveredElements.Count; i++)
+                        {
+                            var Element = HoveredElements[i];
+                            if (Element.OnClickEnd != null)
+                                Element.OnClickEnd(this);
+                        }
+
+                        break;
+
 
                     default:
                         break;
@@ -248,7 +265,7 @@ namespace Clangen
 
 
 
-        public IntPtr GetTexture(string Identifier, bool Cache = false)
+        public IntPtr GetTexture(string Identifier)
         {
             ImageCache.TryGetValue(Identifier, out IntPtr Texture);
             Texture = Texture != default ? Texture : IMG_LoadTexture(Renderer, $"Common\\{Identifier}");
@@ -256,10 +273,8 @@ namespace Clangen
             if (Texture == null)
                 Console.Write(IMG_GetError());
 
-            if (Cache)
+            if (!ImageCache.ContainsKey(Identifier))
                 ImageCache[Identifier] = Texture;
-            else if (ImageCache.ContainsKey(Identifier))
-                ImageCache.Remove(Identifier);
 
             return Texture;
         }
@@ -288,17 +303,19 @@ namespace Clangen
         {
             SDL_RenderClear(Renderer);
 
-            if (CurrentScreen != null)
-            {
-                CurrentScreen.OnClose(this);
-                HoveredElements.RemoveAll(CurrentScreen.Elements.Contains);
-            }
-
             LastScreen = CurrentScreen;
             CurrentScreen = NewScreen;
 
+            if (LastScreen != null)
+            {
+                HoveredElements.RemoveAll((item) => LastScreen.Elements.Contains(item));
+                LastScreen.OnClose(this);
+            }
+
             CurrentScreen.OnOpen(this);
+
             RenderState |= 2;
         }
+        public void SetScreen(string ScreenName) => SetScreen(Screens[ScreenName]);
     } 
 }

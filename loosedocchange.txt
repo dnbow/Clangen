@@ -1,0 +1,3 @@
+toggle dark mode with f10
+toggle fullscreen with f11 (not working yet)
+take screenshot with f12

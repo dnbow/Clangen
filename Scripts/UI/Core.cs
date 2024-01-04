@@ -1,10 +1,9 @@
 ﻿using Clangen;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static SDL2.SDL;
 
-namespace ClangenNET.UI
+namespace Clangen.UI
 {
     public struct ElementTooltip
     {
@@ -29,7 +28,9 @@ namespace ClangenNET.UI
         }
 
         public Action<GameState> OnClick;
+        public Action<GameState> OnClickEnd;
         public Action<GameState> OnDoubleClick;
+        public Action<GameState> OnDoubleClickEnd;
         public Action<GameState> OnHover;
         public Action<GameState> OnHoverOff;
 
@@ -46,7 +47,7 @@ namespace ClangenNET.UI
         public IntPtr _Image;
 
         public override IntPtr Image {
-            get => Hovered ? ImageHovered ?? Image : (!Enabled ? ImageUnavailable ?? Image : _Image);
+            get => (Enabled ? Hovered ? ImageHovered : null : ImageUnavailable) ?? _Image;
             set => _Image = value;
             
         }
@@ -61,6 +62,7 @@ namespace ClangenNET.UI
 
             OnHover = Render; 
             OnHoverOff = Render;
+            OnClickEnd = Render;
         }
     }
 
@@ -73,27 +75,55 @@ namespace ClangenNET.UI
         public SDL_Rect BaseTextureRect;
         public List<BaseElement> Elements;
 
-
         protected BaseScreen()
         {
 
         }
-        protected BaseScreen(IntPtr Texture, SDL_Rect TextureRect, BaseElement[] ElementArray)
+        protected BaseScreen(GameState ctx)
         {
-            BaseTexture = Texture;
-            BaseTextureRect = TextureRect;
-            Elements = ElementArray.ToList();
+            
         }
         ~BaseScreen()
         {
             SDL_DestroyTexture(BaseTexture);
-            Elements.Clear();
+        }
+
+        public virtual void Rebuild(GameState ctx)
+        {
+            if (BaseTexture != null)
+            {
+                SDL_RenderCopy(ctx.Renderer, BaseTexture, ref BaseTextureRect, ref BaseTextureRect);
+                SDL_SetRenderTarget(ctx.Renderer, BaseTexture);
+            }
+            else
+            {
+                SDL_SetRenderTarget(ctx.Renderer, IntPtr.Zero);
+            }
+            
+
+            for (int i = 0; i < Elements.Count; i++)
+            {
+                var Element = Elements[i];
+                Element.Build(ctx);
+                SDL_RenderCopy(ctx.Renderer, Element.Image, IntPtr.Zero, ref Element.Rect);
+            }
+
+            SDL_SetRenderTarget(ctx.Renderer, IntPtr.Zero);
+        }
+
+        public virtual void OnOpen(GameState ctx) 
+        {
+            Elements = new List<BaseElement>();
         }
 
 
-        public virtual void Rebuild(GameState context) { }
-        public virtual void OnOpen(GameState context) { }
-        public virtual void OnClose(GameState context) { }
-        public virtual void OnClick(GameState context) { }
+        public virtual void OnClose(GameState ctx) 
+        { 
+
+        }
+        
+        public virtual void OnClick(GameState ctx) {
+        
+        }
     }
 }

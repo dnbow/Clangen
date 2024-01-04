@@ -1,13 +1,12 @@
-﻿
-using Clangen;
-using ClangenNET.UI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using static SDL2.SDL;
+using Clangen.UI;
+using Clangen.Cats;
 
-namespace ClangenNET.Screens
+namespace Clangen.Screens
 {
-    public class StartScreen : BaseScreen
+    public class Menu : BaseScreen
     {
         public BaseElement ButtonContinue;
         public BaseElement ButtonClanSwitch;
@@ -31,25 +30,26 @@ namespace ClangenNET.Screens
                 ctx.GetTexture("Images\\Buttons\\continue_hover.png"),
                 ctx.GetTexture("Images\\Buttons\\continue_unavailable.png")
             );
-            ButtonContinue.Enabled = false;
             ButtonClanSwitch = new Element(
                 70, 355, 192, 35,
                 ctx.GetTexture("Images\\Buttons\\switch_clan.png"),
                 ctx.GetTexture("Images\\Buttons\\switch_clan_hover.png"),
-                ctx.GetTexture("Images\\Buttons\\switch_clan_unavailable.png")
+                ctx.GetTexture("Images\\Buttons\\switch_clan_unavailable.png"),
+                (GameState c) => c.SetScreen("SwitchClan")
             );
-            ButtonClanSwitch.Enabled = false;
             ButtonClanNew = new Element(
                 70, 400, 192, 35,
                 ctx.GetTexture("Images\\Buttons\\new_clan.png"),
                 ctx.GetTexture("Images\\Buttons\\new_clan_hover.png"),
-                ctx.GetTexture("Images\\Buttons\\new_clan_unavailable.png")
+                ctx.GetTexture("Images\\Buttons\\new_clan_unavailable.png"),
+                (GameState c) => c.SetScreen("ClanCreation")
             );
             ButtonSettings = new Element(
                 70, 445, 192, 35,
                 ctx.GetTexture("Images\\Buttons\\settings.png"),
                 ctx.GetTexture("Images\\Buttons\\settings_hover.png"),
-                ctx.GetTexture("Images\\Buttons\\settings_unavailable.png")
+                ctx.GetTexture("Images\\Buttons\\settings_unavailable.png"),
+                (GameState c) => c.SetScreen(c.Screens["Settings"])
             );
             ButtonQuit = new Element(
                 70, 490, 192, 35,
@@ -80,31 +80,121 @@ namespace ClangenNET.Screens
                 (GameState _) => SDL_OpenURL("https://discord.com/invite/clangen")
             );
 
+            ctx.CurrentClan = new Clan();
+
+            ButtonContinue.Enabled = false;
+            ButtonClanSwitch.Enabled = false;
+
             Elements = new List<BaseElement> { ButtonContinue, ButtonClanSwitch, ButtonClanNew, ButtonSettings, ButtonQuit, SocialTwitter, SocialTumblr, SocialDiscord };
         }
 
 
-
-        public override void OnClose(GameState ctx)
+        public class SwitchClan : BaseScreen
         {
-            Elements.Clear();
+            public override void OnOpen(GameState ctx)
+            {
+                base.OnOpen(ctx);
+            }
         }
 
 
-        public override void Rebuild(GameState ctx)
+        public class ClanCreation : BaseScreen
         {
-            SDL_RenderCopy(ctx.Renderer, BaseTexture, ref BaseTextureRect, ref BaseTextureRect);
-            SDL_SetRenderTarget(ctx.Renderer, BaseTexture);
+            public BaseElement ButtonClassic;
+            public BaseElement ButtonExpanded;
+            public BaseElement ButtonCruel;
 
-            for (int i = 0; i < Elements.Count; i++)
+            public override void OnOpen(GameState ctx)
             {
-                var Element = Elements[i];
-                Element.Build(ctx);
-                SDL_RenderCopy(ctx.Renderer, Element.Image, IntPtr.Zero, ref Element.Rect);
-            }
+                if (BaseTexture == IntPtr.Zero)
+                    BaseTextureRect = new SDL_Rect { x = 0, y = 0, w = ctx.ScreenWidth, h = ctx.ScreenHeight };
 
-            SDL_SetRenderTarget(ctx.Renderer, BaseTexture);
-            
+                ButtonClassic = new Element(
+                    109, 240, 132, 30,
+                    ctx.GetTexture("Images\\Buttons\\classic_mode.png"),
+                    ctx.GetTexture("Images\\Buttons\\classic_mode_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\classic_mode_unavailable.png"),
+                    (GameState c) =>
+                    {
+                        c.CurrentClan.Gamemode = GamemodeType.Classic;
+                    }
+                ) ;
+                ButtonExpanded = new Element(
+                    94, 320, 162, 34,
+                    ctx.GetTexture("Images\\Buttons\\expanded_mode.png"),
+                    ctx.GetTexture("Images\\Buttons\\expanded_mode_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\expanded_mode_unavailable.png"),
+                    (GameState c) =>
+                    {
+                        c.CurrentClan.Gamemode = GamemodeType.Expanded;
+                    }
+                );
+                ButtonCruel = new Element(
+                    100, 400, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\cruel_season.png"),
+                    ctx.GetTexture("Images\\Buttons\\cruel_season_hover.png"),
+                    null
+                );
+
+                Elements = new List<BaseElement>() { ButtonClassic, ButtonExpanded, ButtonCruel };
+            }
+        }
+
+
+        public class Settings : BaseScreen
+        {
+            public BaseElement ButtonSettings;
+            public BaseElement ButtonSettingsSave;
+            public BaseElement ButtonSettingsRelation;
+            public BaseElement ButtonLanguage;
+            public BaseElement ButtonInfo;
+            public BaseElement ButtonMainMenu;
+
+            public override void OnOpen(GameState ctx)
+            {
+                if (BaseTexture == IntPtr.Zero)
+                    BaseTextureRect = new SDL_Rect { x = 0, y = 0, w = ctx.ScreenWidth, h = ctx.ScreenHeight };
+
+                ButtonSettings = new Element(
+                    100, 100, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\general_settings.png"),
+                    ctx.GetTexture("Images\\Buttons\\general_settings_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\general_settings_unavailable.png")
+                );
+                ButtonSettingsSave = new Element(
+                   327, 550, 146, 30,
+                    ctx.GetTexture("Images\\Buttons\\save_settings.png"),
+                    ctx.GetTexture("Images\\Buttons\\save_settings_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\save_settings_unavailable.png")
+                );
+                ButtonSettingsRelation = new Element(
+                    250, 100, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\relation_settings.png"),
+                    ctx.GetTexture("Images\\Buttons\\relation_settings_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\relation_settings_unavailable.png")
+                );
+                ButtonLanguage = new Element(
+                   550, 100, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\language.png"),
+                    ctx.GetTexture("Images\\Buttons\\language_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\language_unavailable.png")
+                );
+                ButtonInfo = new Element(
+                    400, 100, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\info.png"),
+                    ctx.GetTexture("Images\\Buttons\\info_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\info_unavailable.png")
+                );
+                ButtonMainMenu = new Element(
+                    25, 25, 150, 30,
+                    ctx.GetTexture("Images\\Buttons\\main_menu.png"),
+                    ctx.GetTexture("Images\\Buttons\\main_menu_hover.png"),
+                    ctx.GetTexture("Images\\Buttons\\main_menu_unavailable.png"),
+                    (GameState c) => c.SetScreen("Menu")
+                );
+
+                Elements = new List<BaseElement>() { ButtonSettings, ButtonSettingsSave, ButtonSettingsRelation, ButtonLanguage, ButtonInfo, ButtonMainMenu };
+            }
         }
     }
 }
