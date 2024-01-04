@@ -1,9 +1,5 @@
-﻿
-
-using SDL2;
-using System;
+﻿using System.IO;
 using static SDL2.SDL;
-using static SDL2.SDL_image;
 
 namespace Clangen
 {
@@ -11,32 +7,25 @@ namespace Clangen
     {
         static int Main(string[] args)
         {
+            Directory.SetCurrentDirectory("C:\\Users\\dnbow\\OneDrive\\Desktop\\ClangenNET");
             GameState gameState = new GameState();
 
+            gameState.Init();
+            gameState.Load();
+            gameState.Finalise();
+
+            gameState.SetScreen(gameState.Screens[0]);
+
+            gameState.isRunning = true;
 
             while (gameState.isRunning)
             {
-                while (SDL_PollEvent(out SDL_Event e) == 1)
-                {
-                    switch (e.type)
-                    {
-                        case SDL_EventType.SDL_QUIT:
-                            gameState.isRunning = false;
-                            break;
-                    }
-                }
-
-                if (SDL_RenderClear(gameState.Renderer) < 0)
-                    Console.WriteLine($"There was an issue with clearing the render surface. {SDL_GetError()}");
-                
-
-
-                SDL_RenderPresent(gameState.Renderer);
+                gameState.Update();
+                gameState.Render();
+                SDL_Delay(16); // Temporary fix for a 60 fps limiter
             }
 
-            SDL_DestroyRenderer(gameState.Renderer);
-            SDL_DestroyWindow(gameState.Window);
-            SDL_Quit();
+            gameState.Quit();
 
             return 0;
         }
