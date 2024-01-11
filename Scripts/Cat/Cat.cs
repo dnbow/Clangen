@@ -1,6 +1,11 @@
 ﻿namespace Clangen.Cats
 {
-    public class Cat
+    interface ICat
+    {
+
+    }
+
+    public class Cat : ICat
     {
 
     }

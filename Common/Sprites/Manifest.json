@@ -1,0 +1,63 @@
+{
+    "@CatCollection": { // Default settings for a collection of sprites
+        "Layout": [ 3, 7 ],
+        "Map": [
+            "Kit0",
+            "Kit1",
+            "Kit2",
+            "Adolescent0",
+            "Adolescent1",
+            "Adolescent2",
+            "Young",
+            "Adult",
+            "Senior",
+            "YoungLong",
+            "AdultLong",
+            "SeniorLong",
+            "Elder",
+            "ElderLong",
+            "ElderApp",
+            "AdultParalyzed",
+            "YoungParalyzed",
+            "NewbornParalyzed",
+            "AdultSick",
+            "YoungSick",
+            "Newborn"
+        ]
+    },
+
+    "@ColourSheet": { // Default settings for a spritesheet
+        "BaseCollection": "@ColourSheet",
+        "SpriteSize": 50,
+        "Map": [
+            "White",
+            "PaleGrey",
+            "Silver",
+            "Grey",
+            "DarkGrey",
+            "Ghost",
+            "Black",
+            "Cream",
+            "PaleGinger",
+            "Golden",
+            "Ginger",
+            "DarkGinger",
+            "Sienna",
+            null,
+            "LightBrown",
+            "Lilac",
+            "Brown",
+            "GoldenBrown",
+            "DarkBrown",
+            "Chocolate",
+            null
+        ]
+    },
+
+
+
+    "ColoursAgouti.png": {
+        "ID": "Agouti",
+        "Base": "@ColourSheet"
+    }
+}

@@ -1,321 +1,263 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
+using static SDL2.SDL_ttf;
 using Clangen.UI;
 using Clangen.Cats;
+using static Clangen.Utility;
+using static Clangen.Manager;
+using System.Runtime.Serialization;
 
 namespace Clangen
 {
-    public struct Color
+    [Flags]
+    internal enum RenderAction : byte
     {
-        public uint Value;
-
-        public Color(uint Value) 
-        {
-            this.Value = Value;
-        }
-        public Color(byte Red, byte Green, byte Blue, byte Alpha = 255)
-        {
-            Value = (uint)((Red << 24) | (Green << 16) | (Blue << 8) | Alpha);
-        }
-
-        public byte Red  => (byte)((Value & 0xFF000000) >> 24);
-        public byte Green => (byte)((Value & 0xFF0000) >> 16);
-        public byte Blue  => (byte)((Value & 0xFF00) >> 8);
-        public byte Alpha => (byte)(Value & 0xFF);
-
-        public static implicit operator Color(int Value) => new Color((uint)Value);
-    }
-    public class ThemeState
-    {
-        public bool IsDarkMode = false;
-
-        public Color BackgroundLight = new Color(206, 194, 168);
-        public Color BackgroundDark = new Color(57, 50, 36);
-
-        public Color Background => IsDarkMode ? BackgroundDark : BackgroundLight;
+        Clear = 1,
+        Present = 2,
+        Rebuild = 4,
     }
 
-
-    public class GameState
+    /// <summary>
+    /// Represents a class where shared and/or commonly used declarations that both third and first body developers can use
+    /// </summary>
+    public static class Context
     {
-        public IntPtr Window;
-        public IntPtr Renderer;
-        public byte RenderState;
+        /// <summary>
+        /// Represents the Version and Build of the game
+        /// </summary>
+        public static class Version
+        {
+            public const byte Major = 0;
+            public const byte Minor = 0;
+            public const ushort Revision = 1;
 
-        public Dictionary<string, IntPtr> ImageCache;
-        public ThemeState Theme = new ThemeState();
+            /// <summary>
+            /// A nice little label that represents the current major/minor update
+            /// </summary>
+            public const string Label = "Primordial Soup";
 
-        public bool isRunning = false;
-        public bool isFullscreen = false;
-
-        public int ScreenWidth  { get; set; } = 800;
-        public int ScreenHeight { get; set; } = 700;
-
-        public Dictionary<string, BaseScreen> Screens = new Dictionary<string, BaseScreen>();
-        public BaseScreen CurrentScreen;
-        public BaseScreen LastScreen;
-
-        public List<BaseElement> HoveredElements = new List<BaseElement>();
-
-        public Clan CurrentClan;
-
-
-        public GameState() { 
-            ImageCache = new Dictionary<string, IntPtr>();
+            /// <summary>
+            /// A 32-bit int summarising the version, useful in save data and error logging
+            /// </summary>
+            public const uint Build = (Major << 24) + (Minor << 16) + Revision;
         }
 
+        /// <summary>
+        /// See <see cref="ImageManager"/> for more info
+        /// </summary>
+        public static ImageManager Images = new ImageManager();
 
+        /// <summary>
+        /// See <see cref="FontManager"/> for more info
+        /// </summary>
+        public static FontManager Fonts = new FontManager();
 
-        public int Init()
+        /// <summary>
+        /// See <see cref="ScreenManager"/> for more info
+        /// </summary>
+        public static ScreenManager Screens = new ScreenManager();
+
+        public static SpriteLoader Sprites = new SpriteLoader();
+
+        /// <summary>
+        /// Pointer to SDL_Renderer*
+        /// </summary>
+        public static Renderer Renderer;
+
+        public static void Clear()
         {
-            SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
+            InternalContext.RenderState |= RenderAction.Clear;
+        }
+        public static void Present()
+        {
+            InternalContext.RenderState |= RenderAction.Present;
+        }
+
+        /// <summary>
+        /// Render a texture to the screen
+        /// </summary>
+        /// <param name="Texture">The Source texture</param>
+        /// <returns>Whether or not the Texture was rendered</returns>
+        /// <remarks></remarks>
+        public static void Render(Image Texture, SDL_Rect? SourceRect = null, SDL_Rect? DestinationRect = null)
+        {
+            SDL_Rect srcrect, dstrect;
+
+            if (!(SourceRect is null) && !(DestinationRect is null))
+            {
+                srcrect = SourceRect.Value;
+                dstrect = DestinationRect.Value;
+                SDL_RenderCopy(Renderer, Texture, ref srcrect, ref dstrect);
+            }
+            else if (!(SourceRect is null) && DestinationRect is null)
+            {
+                srcrect = SourceRect.Value;
+                SDL_RenderCopy(Renderer, Texture, ref srcrect, IntPtr.Zero);
+            }
+            else if (SourceRect is null && !(DestinationRect is null))
+            {
+                dstrect = DestinationRect.Value;
+                SDL_RenderCopy(Renderer, Texture, IntPtr.Zero, ref dstrect);
+            }
+            else if (SourceRect is null && DestinationRect is null)
+            {
+                SDL_RenderCopy(Renderer, Texture, IntPtr.Zero, IntPtr.Zero);
+            }
+
+            InternalContext.RenderState |= RenderAction.Present;
+        }
+
+        public static void RenderOnto(Image Source, Image Destination, SDL_Rect? SourceRect = null, SDL_Rect? DestinationRect = null)
+        {
+            IntPtr PrevTarget = SDL_GetRenderTarget(Renderer);
+            SDL_SetRenderTarget(Renderer, Destination);
+            Render(Source, SourceRect, DestinationRect);
+            SDL_SetRenderTarget(Renderer, PrevTarget);
+        }
+        
+
+        /// <summary>
+        /// Represents the games UI, Composition and Color
+        /// </summary>
+        public static ThemeManager Theme = new ThemeManager();
+
+        /// <summary>
+        /// Represents the Application Window currently being used
+        /// </summary>
+        public static Window Window;
+
+
+
+        public static Clan Clan;
+
+        public static readonly List<Element> HoveredElements = new List<Element>();
+
+        public static EventHandlerEmpty OnQuit;
+    }
+
+    /// <summary>
+    /// Represents a class inherently unsafe declarations or ones that shouldnt be accessable to anybody but first body developers
+    /// </summary>
+    internal static class InternalContext
+    {
+        internal static bool RunningState = false;
+        internal static RenderAction RenderState;
+        internal static ulong GameTick;
+
+        /// <summary>
+        /// Set up important systems
+        /// </summary>
+        /// <returns>0 on success, anything else on failure</returns>
+        public static int Prepare()
+        {
+            SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1"); // Allows for .NET Threads
             if (SDL_Init(SDL_INIT_VIDEO) < 0)
             {
-                Console.WriteLine($"There was an issue initilizing SDL. {SDL_GetError()}");
-                return 10;
-            }
-
-            Window = SDL_CreateWindow("ClangenNET", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 700, SDL_WindowFlags.SDL_WINDOW_SHOWN);
-            if (Window == IntPtr.Zero)
-            {
-                Console.WriteLine($"There was an issue creating the window. {SDL_GetError()}");
-                return 11;
-            }
-
-            Renderer = SDL_CreateRenderer(Window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
-            if (Renderer == IntPtr.Zero)
-            {
-                Console.WriteLine($"There was an issue creating the renderer. {SDL_GetError()}");
-                return 12;
+                Log($"Library SDL Uninitialised -> {SDL_GetError()}");
+                return -10;
             }
 
             if (IMG_Init(IMG_InitFlags.IMG_INIT_PNG) == 0)
             {
-                Console.WriteLine($"There was an issue initilizing SDL2_Image {IMG_GetError()}");
-                return 13;
+                Log($"Library SDL_IMAGE Uninitialised -> {IMG_GetError()}");
+                return -11;
+            }
+
+            if (TTF_Init() < 0)
+            {
+                Log($"Library SDL_TTF Uninitialised -> {TTF_GetError()}");
+                return -12;
+            }
+
+            Context.Window = new Window("Dnbows' Clangen", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 700, SDL_WindowFlags.SDL_WINDOW_SHOWN);
+            if (!Context.Window.Exists)
+            {
+                Log($"Window Creation failed: {SDL_GetError()}");
+                return -10;
+            }
+
+            Context.Renderer = SDL_CreateRenderer(Context.Window, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
+            if (!Context.Renderer.Exists)
+            {
+                Log($"SDL_CreateRenderer failed: {SDL_GetError()}");
+                return -10;
             }
 
             return 0;
         }
 
 
-
-        public int Load()
+        internal static int Load()
         {
+            Context.Fonts.Reload();
+            Context.Theme.Reload();
+            Context.Screens.Reload();
+            Context.Sprites.Load();
             return 0;
         }
 
-
-
-        public int Finalise()
+        internal static void Quit()
         {
-            foreach (
-                var Screen in AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(assembly => assembly.GetTypes())
-                    .Where(type => type.IsSubclassOf(typeof(BaseScreen)))
-                    .Select(type => Activator.CreateInstance(type) as BaseScreen)
-                    )
-                Screens[Screen.GetType().Name] = Screen;
-            
+            RunningState = false;
 
-            return 0;
-        }
+            Context.OnQuit?.Invoke();
 
+            Context.Window.Destroy();
+            Context.Renderer.Destroy();
 
+            foreach (Font font in Context.Fonts)
+                font.Destroy();
 
-        public void Quit()
-        {
-            isRunning = false;
-            SDL_DestroyRenderer(Renderer);
-            SDL_DestroyWindow(Window);
+            TTF_Quit();
+            IMG_Quit();
             SDL_Quit();
         }
 
-
-
-        public void Render(int maxState = 0)
+        internal static void Render()
         {
-            switch (RenderState | maxState)
+            if (RenderState == 0) 
+                return;
+
+            if ((RenderState & RenderAction.Clear) != 0)
             {
-                case 1: // Just present
-                    SDL_RenderPresent(Renderer);
-                    break;
-                case 2: // Rebuild current screen
-                    var Background = Theme.Background;
-                    SDL_SetRenderDrawColor(Renderer, Background.Red, Background.Green, Background.Blue, Background.Alpha);
-                    SDL_RenderClear(Renderer);
-                    CurrentScreen.Rebuild(this);
-                    SDL_RenderPresent(Renderer);
-                    break;
-                default:
-                    break;
+                SDL_RenderClear(Context.Renderer);
             }
 
+            else if ((RenderState & RenderAction.Rebuild) != 0)
+            {
+                Color Background = Context.Theme.Background;
+                SDL_SetRenderDrawColor(Context.Renderer, Background.Red, Background.Green, Background.Blue, Background.Alpha);
+                SDL_RenderClear(Context.Renderer);
+                Context.Screens.Current.Construct();
+                Context.Screens.Current.Render();
+                Context.Render(Context.Screens.Current.Texture);
+            }
+
+            SDL_RenderPresent(Context.Renderer);
             RenderState = 0;
         }
 
 
-
-        public void Update()
+        internal static void Tick()
         {
+            GameTick = SDL_GetTicks64();
+
             while (SDL_PollEvent(out SDL_Event Event) == 1)
             {
+
                 switch (Event.type)
                 {
                     case SDL_EventType.SDL_QUIT:
-                        isRunning = false;
+                        Quit();
                         break;
-
-                    case SDL_EventType.SDL_KEYUP:
-                        break;
-
-                    case SDL_EventType.SDL_KEYDOWN:
-                        switch (Event.key.keysym.sym)
-                        {
-                            case SDL_Keycode.SDLK_F10: // Toggle darkmode
-                                Theme.IsDarkMode = !Theme.IsDarkMode;
-                                RenderState |= 2;
-                                break;
-
-                            case SDL_Keycode.SDLK_F11:
-                                SetFullscreen(!isFullscreen);
-                                break;
-
-                            case SDL_Keycode.SDLK_F12:
-                                SDL_GetRendererOutputSize(Renderer, out int W, out int H);
-                                IntPtr Screenshot = SDL_CreateRGBSurface(0, W, H, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-
-                                unsafe {
-                                    SDL_Surface * Surface = (SDL_Surface *) Screenshot;
-                                    SDL_Rect rect = new SDL_Rect { x = 0, y = 0, w = ScreenWidth, h = ScreenHeight };
-
-                                    SDL_LockSurface(Screenshot);
-                                    SDL_RenderReadPixels(SDL_GetRenderer(Window), ref rect, ((SDL_PixelFormat*)(Surface->format))->format, Surface->pixels, Surface->pitch);
-                                    SDL_UnlockSurface(Screenshot);
-                                    IMG_SavePNG(Screenshot, $"Screenshots\\{DateTime.Now.Ticks}.png");
-                                    SDL_FreeSurface(Screenshot);
-                                }
-                                break;
-                                
-                        }
-                        break;
-
-                    case SDL_EventType.SDL_MOUSEMOTION:
-                        SDL_GetMouseState(out int MouseX, out int MouseY);
-
-                        for (int i = 0; i < CurrentScreen.Elements.Count; i++)
-                        {
-                            var Element = CurrentScreen.Elements[i];
-                            if (Element.Enabled)
-                            {
-                                SDL_Rect rect = Element.Rect;
-                                bool isHovered = rect.x < MouseX && rect.y < MouseY && MouseX <= (rect.w + rect.x) && MouseY <= (rect.h + rect.y);
-
-                                if (isHovered && !Element.Hovered)
-                                {
-                                    Element.Hovered = true;
-                                    if (Element.OnHover != null)
-                                        Element.OnHover(this);
-                                    HoveredElements.Add(Element);
-                                    RenderState |= 1;
-                                }
-                                else if (!isHovered && Element.Hovered)
-                                {
-                                    Element.Hovered = false;
-                                    if (Element.OnHoverOff != null) 
-                                        Element.OnHoverOff(this);
-                                    if (HoveredElements.Contains(Element))
-                                        HoveredElements.Remove(Element);
-                                    RenderState |= 1;
-                                }
-                            }
-                        }
-
-                        break;
-
-                    case SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                        for (int i = 0; i < HoveredElements.Count; i++)
-                        {
-                            var Element = HoveredElements[i];
-                            if (Element.OnClick != null && Element.Enabled)
-                                Element.OnClick(this);
-                        }
-
-			            break;
-
-                    case SDL_EventType.SDL_MOUSEBUTTONUP:
-                        for (int i = 0; i < HoveredElements.Count; i++)
-                        {
-                            var Element = HoveredElements[i];
-                            if (Element.OnClickEnd != null)
-                                Element.OnClickEnd(this);
-                        }
-
-                        break;
-
-
                     default:
                         break;
                 }
+
+                Context.Screens.Current.Tick(Event);
             }
         }
-
-
-
-        public IntPtr GetTexture(string Identifier)
-        {
-            ImageCache.TryGetValue(Identifier, out IntPtr Texture);
-            Texture = Texture != default ? Texture : IMG_LoadTexture(Renderer, $"Common\\{Identifier}");
-
-            if (Texture == null)
-                Console.Write(IMG_GetError());
-
-            if (!ImageCache.ContainsKey(Identifier))
-                ImageCache[Identifier] = Texture;
-
-            return Texture;
-        }
-
-
-
-        public void SetFullscreen(bool state)
-        {
-            isFullscreen = state;
-
-            if (state)
-            {
-                SDL_SetWindowFullscreen(Window, 0);
-            }
-            else
-            {
-                SDL_SetWindowFullscreen(Window, (uint)SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
-            }
-
-            RenderState |= 2;
-        }
-
-
-
-        public void SetScreen(BaseScreen NewScreen)
-        {
-            SDL_RenderClear(Renderer);
-
-            LastScreen = CurrentScreen;
-            CurrentScreen = NewScreen;
-
-            if (LastScreen != null)
-            {
-                HoveredElements.RemoveAll((item) => LastScreen.Elements.Contains(item));
-                LastScreen.OnClose(this);
-            }
-
-            CurrentScreen.OnOpen(this);
-
-            RenderState |= 2;
-        }
-        public void SetScreen(string ScreenName) => SetScreen(Screens[ScreenName]);
     } 
 }

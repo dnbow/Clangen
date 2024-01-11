@@ -27,6 +27,8 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -76,6 +78,13 @@
     <ApplicationIcon>main.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont, Version=4.0.1.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\SharpFont.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -93,11 +102,16 @@
     <Compile Include="Libraries\SDL2\SDL2_ttf.cs" />
     <Compile Include="Scripts\Cat\Cat.cs" />
     <Compile Include="Scripts\Cat\Clan.cs" />
+    <Compile Include="Scripts\Cat\Sprite.cs" />
+    <Compile Include="Scripts\Core.cs" />
     <Compile Include="Scripts\Game.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scripts\Screens\ScreenMenu.cs" />
+    <Compile Include="Scripts\Parsers\Config.cs" />
+    <Compile Include="Scripts\Parsers\Types.cs" />
+    <Compile Include="Scripts\Screens\MainMenu.cs" />
     <Compile Include="Scripts\UI\Core.cs" />
+    <Compile Include="Scripts\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\Events\" />
@@ -105,6 +119,8 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Content Include="freetype6.dll" />
+    <Content Include="Libraries\SharpFont.dll" />
     <Content Include="LICENSE.txt" />
     <Content Include="loosedocchange.txt" />
     <Content Include="main.ico" />
@@ -114,8 +130,12 @@
     <Content Include="SDL2_image.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SDL2_ttf.dll" />
+    <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
+    <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>

@@ -1,31 +1,37 @@
-﻿using System.IO;
+﻿using Clangen.Cats;
+using System.IO;
 using static SDL2.SDL;
+using static SDL2.SDL_image;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System;
 
 namespace Clangen
 {
     internal class Program
-    {
-        static int Main(string[] args)
+    { 
+        internal static int Main(string[] Args)
         {
-            Directory.SetCurrentDirectory("C:\\Users\\dnbow\\OneDrive\\Desktop\\ClangenNET");
-            GameState gameState = new GameState();
+            Directory.SetCurrentDirectory("C:\\Users\\dnbow\\OneDrive\\Desktop\\ClangenNET"); // TEMPORARY FIX
 
-            gameState.Init();
-            gameState.Load();
-            gameState.Finalise();
+            InternalContext.Prepare();
+            InternalContext.Load();
 
-            gameState.SetScreen(gameState.Screens["Menu"]);
+            Context.Sprites["Agouti"].TextureAtlas.Save("output.png");
+            Context.Images["menu.png"].Save("menu.png");
 
-            gameState.isRunning = true;
+            return 0;
 
-            while (gameState.isRunning)
+            Context.Screens.SetScreen("Menu");
+
+            InternalContext.RunningState = true;
+            while (InternalContext.RunningState)
             {
-                gameState.Update();
-                gameState.Render();
+                InternalContext.Tick();
+                InternalContext.Render();
+
                 SDL_Delay(16); // Temporary fix for a 60 fps limiter
             }
-
-            gameState.Quit();
 
             return 0;
         }
