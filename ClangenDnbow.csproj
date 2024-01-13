@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5A8FDB33-CC5E-4B80-A6B1-8E4CB2EAA784}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ClangenNET</RootNamespace>
-    <AssemblyName>ClangenNET</AssemblyName>
+    <RootNamespace>Clangen</RootNamespace>
+    <AssemblyName>ClangenDnbow</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -75,7 +75,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>main.ico</ApplicationIcon>
+    <ApplicationIcon>Game.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -102,6 +102,9 @@
     <Compile Include="Libraries\SDL2\SDL2_ttf.cs" />
     <Compile Include="Scripts\Cat\Cat.cs" />
     <Compile Include="Scripts\Cat\Clan.cs" />
+    <Compile Include="Scripts\Cat\Condition.cs" />
+    <Compile Include="Scripts\Cat\History.cs" />
+    <Compile Include="Scripts\Cat\Relations.cs" />
     <Compile Include="Scripts\Cat\Sprite.cs" />
     <Compile Include="Scripts\Core.cs" />
     <Compile Include="Scripts\Game.cs" />
@@ -120,10 +123,9 @@
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
     <Content Include="freetype6.dll" />
+    <Content Include="Game.ico" />
     <Content Include="Libraries\SharpFont.dll" />
     <Content Include="LICENSE.txt" />
-    <Content Include="loosedocchange.txt" />
-    <Content Include="main.ico" />
     <Content Include="SDL2.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -162,10 +162,10 @@ namespace Clangen.UI
             }
         }
 
-        public RawTextbox(int X, int Y, int W, int H, string DefaultText, Font Font, Color? Color = null) : base(X, Y, W, H)
+        public RawTextbox(int X, int Y, int W, int H, string DefaultText, string Font, Color? Color = null) : base(X, Y, W, H)
         {
             Rect = new SDL_Rect { x = X, y = Y, w = W, h = H };
-            FontType = Font;
+            FontType = Context.Fonts[Font];
             FontColor = Color ?? Context.Theme.FontColor;
             _Text = DefaultText;
 
@@ -186,23 +186,38 @@ namespace Clangen.UI
 
 
 
-    public abstract class BaseScreen
+    public interface IScreen
     {
-        public Image Texture;
-        public abstract void Construct();
-        public abstract void Render();
-        public abstract void Deconstruct();
-        public abstract void Tick(SDL_Event Event);
+        Image Texture { get; }
+        void Construct();
+        void Render();
+        void Deconstruct();
+        void Tick(SDL_Event Event);
     }
 
 
-    public class Screen : BaseScreen
+    public class Screen : IScreen
     {
         public Image Background;
+        public Image Texture { 
+            get => _Texture;
+            set => _Texture = value;
+        }
+
+        private Image _Texture;
 
         protected Dictionary<string, int> Lookup;
         protected List<BaseElement> Elements;
         protected List<BaseElement> HoveredElements;
+
+        public Screen()
+        {
+
+        }
+        ~Screen()
+        {
+
+        }
 
         public BaseElement this[string Key]
         {
@@ -224,16 +239,7 @@ namespace Clangen.UI
             }
         }
 
-        public Screen()
-        {
-
-        }
-        ~Screen()
-        {
-
-        }
-
-        public override void Construct()
+        public void Construct()
         {
             Lookup = new Dictionary<string, int>();
             Elements = new List<BaseElement>();
@@ -242,12 +248,12 @@ namespace Clangen.UI
             OnOpen();
         }
 
-        public override void Render()
+        public void Render()
         {
-            if (Texture == null)
-                Texture = new Image(Context.Theme.Background);
+            if (_Texture == null)
+                _Texture = new Image(800, 700, Context.Theme.Background);
 
-            SDL_SetRenderTarget(Context.Renderer, Texture);
+            SDL_SetRenderTarget(Context.Renderer, _Texture);
 
             if (!(Background is null))
                 Context.Render(Background, null, Background.Rect);
@@ -264,7 +270,7 @@ namespace Clangen.UI
             SDL_SetRenderTarget(Context.Renderer, IntPtr.Zero);
         }
 
-        public override void Deconstruct()
+        public void Deconstruct()
         {
             if (!(Background is null))
                 Background.Destroy();
@@ -272,7 +278,7 @@ namespace Clangen.UI
             OnClose();
         }
 
-        public override void Tick(SDL_Event Event)
+        public void Tick(SDL_Event Event)
         {
             switch (Event.type)
             {

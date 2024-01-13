@@ -5,11 +5,12 @@ using static SDL2.SDL_image;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
 
 namespace Clangen
 {
     internal class Program
-    { 
+    {
         internal static int Main(string[] Args)
         {
             Directory.SetCurrentDirectory("C:\\Users\\dnbow\\OneDrive\\Desktop\\ClangenNET"); // TEMPORARY FIX
@@ -17,10 +18,7 @@ namespace Clangen
             InternalContext.Prepare();
             InternalContext.Load();
 
-            Context.Sprites["Agouti"].TextureAtlas.Save("output.png");
-            Context.Images["menu.png"].Save("menu.png");
-
-            return 0;
+            Context.Sprites["Agouti.Brown.Kit0"].Save("__CatOutput.png");
 
             Context.Screens.SetScreen("Menu");
 

@@ -49,7 +49,7 @@ namespace Clangen
             else if (CleanHex.Length == 8)
                 Value = Convert.ToUInt32(CleanHex, 16);
             else
-                throw new Exception("Couldnt convert \"{HexValue}\" to Color"); // TEMP
+                throw new Exception($"Couldnt convert \"{HexValue}\" to Color"); // TEMP
         }
 
         public uint Value
@@ -316,7 +316,7 @@ namespace Clangen
     {
         public string Name { get; private set; }
 
-        private readonly IntPtr Face;
+        private IntPtr Face;
 
         public Font(string Name, IntPtr Face)
         {
@@ -328,12 +328,15 @@ namespace Clangen
         public void Destroy()
         {
             if (Face != null)
+            {
                 TTF_CloseFont(Face);
+                Face = IntPtr.Zero;
+            }
         }
 
-        public IntPtr Render(string Text, int Size = -1)
+        public Image Render(string Text, int Size = -1)
         {
-            return IntPtr.Zero;
+            return IntPtr.Zero; // TEMPRY
         }
         public Image Render(string Text, SDL_Rect BoundingBox, int? Size = null, SDL_Color? Color = null)
         {
@@ -379,7 +382,7 @@ namespace Clangen
 
     }
 
-    public static class Manager
+    namespace Managers
     {
         /// <summary>
         /// Represents a manager for retrieving, caching, modifying and using Images
@@ -457,10 +460,10 @@ namespace Clangen
         /// </summary>
         public class ScreenManager
         {
-            private BaseScreen[] ScreenArray;
+            private IScreen[] ScreenArray;
             private readonly List<short> ArrayHistory = new List<short>();
 
-            public BaseScreen Current
+            public IScreen Current
             {
                 get
                 {
@@ -494,8 +497,9 @@ namespace Clangen
             {
                 ScreenArray = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
-                    .Where(type => type.IsSubclassOf(typeof(BaseScreen)))
-                    .Select(type => Activator.CreateInstance(type) as BaseScreen).ToArray();
+                    .Where(type => typeof(IScreen).IsAssignableFrom(type) && type != typeof(IScreen))
+                    .Select(type => Activator.CreateInstance(type) as IScreen)
+                    .Where(instance => !(instance is null)).ToArray();
             }
 
             public void SetScreen(string ID)

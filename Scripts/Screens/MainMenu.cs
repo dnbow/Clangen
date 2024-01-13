@@ -93,7 +93,7 @@ namespace Clangen.Screens
 
         public override void OnOpen()
         {
-            this["ModeText"] = new RawTextbox(325, 150, 410, 461, "", Context.Fonts["Clangen"]);
+            this["ModeText"] = new RawTextbox(325, 150, 410, 461, "", "Clangen");
 
             RawTextbox ModeText = (RawTextbox)this["ModeText"];
 

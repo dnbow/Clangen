@@ -1,4 +1,6 @@
-﻿namespace Clangen.Cats
+﻿using Clangen.Managers;
+
+namespace Clangen.Cats
 {
     /// <summary>
     /// Represents the current gamemode
@@ -14,5 +16,7 @@
     public class Clan
     {
         public GamemodeType Gamemode;
+
+        public CatManager Cats = new CatManager();
     }
 }

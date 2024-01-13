@@ -6,7 +6,7 @@ using static SDL2.SDL_ttf;
 using Clangen.UI;
 using Clangen.Cats;
 using static Clangen.Utility;
-using static Clangen.Manager;
+using Clangen.Managers;
 using System.Runtime.Serialization;
 
 namespace Clangen
