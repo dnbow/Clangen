@@ -1,5 +1,7 @@
 # Development specific files
+
 .vs/
+
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
