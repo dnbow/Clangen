@@ -2,15 +2,16 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Clangen;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ClangenNET")]
+[assembly: AssemblyTitle("Dnbows' Clangen")]
 [assembly: AssemblyDescription("A C# Rewrite of Clangen!")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ClangenNET")]
+[assembly: AssemblyProduct("Dnbows' Clangen")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -1,0 +1,219 @@
+{
+    // CHANGING ANYTHING HERE WILL DO NOTHING AS OF NOW
+    // ITS PURELY ME EXPERIMENTING WITH CERTAIN FORMATS TO ALLOW FOR DYNAMIC FONT LOADING
+    "@CatGroup": {
+        "SpriteSize": 50,
+        "Layout": [ 3, 7 ],
+        "Map": {
+            "0": {
+                "Alias": "Kit0"
+            },
+            "1": {
+                "Alias": "Kit1"
+            },
+            "2": {
+                "Alias": "Kit2"
+            },
+            "3": {
+                "Alias": "Adolescent0"
+            },
+            "4": {
+                "Alias": "Adolescent1"
+            },
+            "5": {
+                "Alias": "Adolescent2"
+            },
+            "6": {
+                "Alias": "Young"
+            },
+            "7": {
+                "Alias": "Adult"
+            },
+            "8": {
+                "Alias": "Senior"
+            },
+            "9": {
+                "Alias": "YoungLong"
+            },
+            "10": {
+                "Alias": "AdultLong"
+            },
+            "11": {
+                "Alias": "SeniorLong"
+            },
+            "12": {
+                "Alias": "Elder"
+            },
+            "13": {
+                "Alias": "ElderLong"
+            },
+            "14": {
+                "Alias": "ElderApp"
+            },
+            "15": {
+                "Alias": "AdultParalyzed"
+            },
+            "16": {
+                "Alias": "YoungParalyzed"
+            },
+            "17": {
+                "Alias": "NewbornParalyzed"
+            },
+            "18": {
+                "Alias": "AdultSick"
+            },
+            "19": {
+                "Alias": "YoungSick"
+            },
+            "20": {
+                "Alias": "Newborn"
+            }
+        }
+    },
+    "@PeltSheet": {
+        "SpriteSize": 50,
+        "Layout": [ 7, 3 ],
+        "Map": {
+            "0": {
+                "Alias": "White",
+                "Base": "@CatGroup"
+            },
+            "1": {
+                "Alias": "PaleGrey",
+                "Base": "@CatGroup"
+            },
+            "2": {
+                "Alias": "Silver",
+                "Base": "@CatGroup"
+            },
+            "3": {
+                "Alias": "Grey",
+                "Base": "@CatGroup"
+            },
+            "4": {
+                "Alias": "DarkGrey",
+                "Base": "@CatGroup"
+            },
+            "5": {
+                "Alias": "Ghost",
+                "Base": "@CatGroup"
+            },
+            "6": {
+                "Alias": "Black",
+                "Base": "@CatGroup"
+            },
+            "7": {
+                "Alias": "Cream",
+                "Base": "@CatGroup"
+            },
+            "8": {
+                "Alias": "PaleGinger",
+                "Base": "@CatGroup"
+            },
+            "9": {
+                "Alias": "Golden",
+                "Base": "@CatGroup"
+            },
+            "10": {
+                "Alias": "Ginger",
+                "Base": "@CatGroup"
+            },
+            "11": {
+                "Alias": "DarkGinger",
+                "Base": "@CatGroup"
+            },
+            "12": {
+                "Alias": "Sienna",
+                "Base": "@CatGroup"
+            },
+
+            "13": null,
+
+            "14": {
+                "Alias": "LightBrown",
+                "Type": "@CatGroup"
+            },
+            "15": {
+                "Alias": "Lilac",
+                "Type": "@CatGroup"
+            },
+            "16": {
+                "Alias": "Brown",
+                "Type": "@CatGroup"
+            },
+            "17": {
+                "Alias": "GoldenBrown",
+                "Type": "@CatGroup"
+            },
+            "18": {
+                "Alias": "DarkBrown",
+                "Type": "@CatGroup"
+            },
+            "19": {
+                "Alias": "Chocolate",
+                "Type": "@CatGroup"
+            },
+
+            "20": null
+        }
+    },
+
+
+
+    "ColoursAgouti.png": {
+        "Alias": "Agouti",
+        "Base": "@PeltSheet"
+    },
+    "ColoursBengal.png": {
+        "Alias": "Bengal",
+        "Base": "@PeltSheet"
+    },
+    "ColoursClassic.png": {
+        "Alias": "Classic",
+        "Base": "@PeltSheet"
+    },
+    "ColoursMackerel.png": {
+        "Alias": "Mackerel",
+        "Base": "@PeltSheet"
+    },
+    "ColoursMarbled.png": {
+        "Alias": "Marbled",
+        "Base": "@PeltSheet"
+    },
+    "ColoursMasked.png": {
+        "Alias": "Masked",
+        "Base": "@PeltSheet"
+    },
+    "ColoursRosette.png": {
+        "Alias": "Rosette",
+        "Base": "@PeltSheet"
+    },
+    "ColoursSingle.png": {
+        "Alias": "Single",
+        "Base": "@PeltSheet"
+    },
+    "ColoursSinglestripe.png": {
+        "Alias": "Singlestripe",
+        "Base": "@PeltSheet"
+    },
+    "ColoursSmoke.png": {
+        "Alias": "Smoke",
+        "Base": "@PeltSheet"
+    },
+    "ColoursSokoke.png": {
+        "Alias": "Sokoke",
+        "Base": "@PeltSheet"
+    },
+    "ColoursSpeckled.png": {
+        "Alias": "Speckled",
+        "Base": "@PeltSheet"
+    },
+    "ColoursTabby.png": {
+        "Alias": "Tabby",
+        "Base": "@PeltSheet"
+    },
+    "ColoursTicked.png": {
+        "Alias": "Ticked",
+        "Base": "@PeltSheet"
+    }
+}

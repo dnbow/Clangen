@@ -1,42 +1,35 @@
-﻿
-
-using SDL2;
-using System;
+﻿using Clangen.Cats;
+using System.IO;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 
 namespace Clangen
 {
     internal class Program
     {
-        static int Main(string[] args)
+        internal static int Main(string[] Args)
         {
-            GameState gameState = new GameState();
+            Directory.SetCurrentDirectory("C:\\Users\\dnbow\\OneDrive\\Desktop\\ClangenNET"); // TEMPORARY FIX
 
+            InternalContext.Prepare();
+            InternalContext.Load();
 
-            while (gameState.isRunning)
+            Context.Sprites["Agouti.Brown.Kit0"].Save("__CatOutput.png");
+
+            Context.Screens.SetScreen("Menu");
+
+            InternalContext.RunningState = true;
+            while (InternalContext.RunningState)
             {
-                while (SDL_PollEvent(out SDL_Event e) == 1)
-                {
-                    switch (e.type)
-                    {
-                        case SDL_EventType.SDL_QUIT:
-                            gameState.isRunning = false;
-                            break;
-                    }
-                }
+                InternalContext.Tick();
+                InternalContext.Render();
 
-                if (SDL_RenderClear(gameState.Renderer) < 0)
-                    Console.WriteLine($"There was an issue with clearing the render surface. {SDL_GetError()}");
-                
-
-
-                SDL_RenderPresent(gameState.Renderer);
+                SDL_Delay(16); // Temporary fix for a 60 fps limiter
             }
-
-            SDL_DestroyRenderer(gameState.Renderer);
-            SDL_DestroyWindow(gameState.Window);
-            SDL_Quit();
 
             return 0;
         }
