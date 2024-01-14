@@ -1,6 +1,6 @@
 # Development specific files
 
-.vs
+/.vs
 
 [Dd]ebug/
 [Dd]ebugPublic/
