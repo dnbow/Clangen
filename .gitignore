@@ -1,5 +1,9 @@
 # Development specific files
+
+/.vs
 .vs/
+.vs
+
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

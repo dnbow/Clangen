@@ -1,5 +1,0 @@
-Rewrite font rendering
-Rewrite theme loading
-
-Dropdown uis
-Textbox entering
