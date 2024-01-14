@@ -161,6 +161,7 @@ namespace Clangen.Cats
         public Skills Skills;
 
         public CatRef Mentor;
+        public int PatrolWithMentor; // Not entirely sure what this is for
 
         public readonly Relations Relations;
         public readonly KinRelations Kin;
