@@ -1,19 +1,16 @@
 ﻿using System.Collections.Generic;
 
-
 namespace Clangen.Managers
 {
     public class CatManager
     {
-        private object __Lock;
-
+        private readonly object __Lock;
         private readonly List<Cats.Cat> KittyArray;
         private ushort Index;
 
         public CatManager() 
         {
             __Lock = new object();
-
             KittyArray = new List<Cats.Cat>(1024);
             Index = 0;
         }
@@ -49,6 +46,11 @@ namespace Clangen.Cats
         Newborn, Kitten, Elder, Apprentice, Warrior, MediatorApprentice, Mediator, MedicineCatApprentice, MedicineCat, Deputy, Leader
     }
 
+    public enum Gender : byte
+    {
+        Male, Female
+    }
+
 
 
     public struct Pronoun
@@ -60,34 +62,6 @@ namespace Clangen.Cats
         public string Self;
         public bool Conjugate;
         // False: Plural, True: Singular
-    }
-
-
-
-    public class Looks
-    {
-        public string Name;
-        public string Colour;
-        public string Pattern;
-        public string TortieBase;
-        public string TortiePattern;
-        public string TortieColour;
-        public string WhitePatches;
-        public string EyeColour;
-        public string EyeColour2;
-        public string Vitiligo;
-        public string Length;
-        public string Points;
-        public string Accessory;
-        public string Scars;
-        public string Tint;
-        public string WhitePatchesTint;
-        public string Skin;
-
-        public byte Opacity;
-
-        public bool Paralyzed;
-        public bool Reversed;
     }
 
 
@@ -153,11 +127,16 @@ namespace Clangen.Cats
         public bool SpecialSuffixHidden;
 
         public Looks Looks;
+        public History History;
+
+        public Age Age;
+
+        public bool Gender;
+        public Gender GenderAlign;
 
         public Status Status;
         public Pronoun Pronouns;
         public Personality Personality;
-        public History History;
         public Skills Skills;
 
         public CatRef Mentor;
@@ -166,17 +145,14 @@ namespace Clangen.Cats
         public readonly Relations Relations;
         public readonly KinRelations Kin;
 
-        public Age Age;
-
         public bool Dead;
         public bool Outside;
         public bool Exiled;
 
 
-        // DETERMINING USE FOR VARIABLES BELOW
+        // DETERMINING USAGE FOR VARIABLES BELOW
         public int DeadFor;
         public bool DarkForest;
-        public string Gender;
         public string Backstory;
         public List<CatRef> Apprentice;
         public dynamic Placement;

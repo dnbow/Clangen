@@ -1,11 +1,7 @@
-﻿using Clangen.Cats;
-using System.IO;
+﻿using System.IO;
 using static SDL2.SDL;
-using static SDL2.SDL_image;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System;
-using System.Diagnostics;
+
+
 
 namespace Clangen
 {
@@ -17,8 +13,6 @@ namespace Clangen
 
             InternalContext.Prepare();
             InternalContext.Load();
-
-            Context.Sprites["Agouti.Brown.Kit0"].Save("__CatOutput.png");
 
             Context.Screens.SetScreen("Menu");
 

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Net.Http.Headers;
+﻿using System.Collections.Generic;
+
 
 namespace Clangen.Cats
 {
@@ -24,8 +22,8 @@ namespace Clangen.Cats
 
     public class Relations
     {
+        private readonly CatRef Source;
         private readonly Dictionary<ushort, Relation> Map;
-        private CatRef Cat;
 
         /// <summary>
         /// A List of this Cats current Mates
@@ -45,13 +43,13 @@ namespace Clangen.Cats
 
             get
             {
-                List <CatRef> Cats = new List<CatRef>();
+                List<CatRef> Cats = new List<CatRef>();
 
-                Cat Cat = this.Cat.Value;
+                Cat Cat = Source.Value;
 
                 for (int i = 0; i < Parents.Count; i++)
                 {
-                    var Parent = Parents[i];
+                    CatRef Parent = Parents[i];
                     
                     if (Parent != Cat.Kin.Parent1 && Parent != Cat.Kin.Parent2)
                         Cats.Add(Parent);
@@ -70,7 +68,7 @@ namespace Clangen.Cats
 
     public class KinRelations
     {
-        private CatRef Cat;
+        private readonly CatRef Source;
 
         /// <summary>
         /// A <see cref="CatRef"> pointing to this Cats First Biological Parent
