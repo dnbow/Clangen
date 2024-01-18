@@ -253,21 +253,21 @@ namespace Clangen.UI
             if (_Texture == null)
                 _Texture = new Image(800, 700, Context.Theme.Background);
 
-            SDL_SetRenderTarget(Context.Renderer, _Texture);
-
-            if (!(Background is null))
-                Context.Render(Background, null, Background.Rect);
-
-            for (int i = 0; i < Elements.Count; i++)
+            using (var Texture = new RenderTarget(_Texture))
             {
-                var element = Elements[i];
-                if (element.Visible)
+
+                if (Background is not null)
+                    Context.Render(Background, null, Background.Rect);
+
+                for (int i = 0; i < Elements.Count; i++)
                 {
-                    element.Render();
+                    var element = Elements[i];
+                    if (element.Visible)
+                    {
+                        element.Render();
+                    }
                 }
             }
-
-            SDL_SetRenderTarget(Context.Renderer, IntPtr.Zero);
         }
 
         public void Deconstruct()
@@ -336,11 +336,6 @@ namespace Clangen.UI
         }
 
         public virtual void OnClose()
-        {
-
-        }
-
-        public void ClearAllBut(string[] Identifers)
         {
 
         }

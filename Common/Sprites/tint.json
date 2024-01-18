@@ -22,7 +22,7 @@
     "CHOCOLATE": "brown"
   },
   "possible_tints": {
-    "basic": ["pink", "gray", "red", "orange", "none"],
+    "basic": ["pink", "grey", "red", "orange", "none"],
     "warm": ["yellow", "purple"],
     "cool": ["blue", "purple", "black"],
     "white": ["yellow"],
@@ -32,7 +32,7 @@
   "tint_colours":
   {
     "pink": [253, 237, 237],
-    "gray": [225, 225, 225],
+    "grey": [225, 225, 225],
     "red": [248, 226, 228],
     "black": [195, 195, 195],
     "orange": [255, 247, 235],

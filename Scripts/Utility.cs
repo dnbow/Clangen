@@ -44,6 +44,9 @@ namespace Clangen
 
             public T ChooseFrom<T>(T[] Array)
             {
+                if (Array.Length == 0)
+                    throw new ArgumentException("Given Array was empty");
+
                 return Array[(int)(Sample() * Array.Length)];
             }
             public T ChooseFrom<T>(T[] Array, int[] Weights)
@@ -61,7 +64,7 @@ namespace Clangen
 
                 for (int i = 0; i < Weights.Length; i++)
                     if (Choice <= Weights[i])
-                        return Array[Choice];
+                        return Array[i];
                     else
                         Choice -= Weights[i];
 

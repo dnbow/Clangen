@@ -54,7 +54,7 @@ namespace Clangen.Cats
                             switch (i / 21)
                             {
                                 case 0: SpriteID = "White"; break;
-                                case 1: SpriteID = "Palegray"; X = 1; break;
+                                case 1: SpriteID = "Palegrey"; X = 1; break;
                                 case 2: SpriteID = "Silver"; X = 2; break;
                                 case 3: SpriteID = "Grey"; X = 3; break;
                                 case 4: SpriteID = "Darkgrey"; X = 4; break;
@@ -134,7 +134,7 @@ namespace Clangen.Cats
                     case "Lineart":
                     case "LineartDead":
                     case "LineartDarkforest":
-                    case "LightingNew":
+                    case "Lighting":
                     case "Shaders":
                         CurrentSheet = Spritesheets[File] = new Spritesheet(Path);
 
@@ -269,10 +269,10 @@ namespace Clangen.Cats
 
                                 // Ryos White Patches
                                 case 28: SpriteID = "Tip"; X = 0; Y = 2; break;
-                                case 29: SpriteID = "Faancy"; X = 1; Y = 2; break;
+                                case 29: SpriteID = "Fancy"; X = 1; Y = 2; break;
                                 case 30: SpriteID = "Freckles"; X = 2; Y = 2; break;
                                 case 31: SpriteID = "Ringtail"; X = 3; Y = 2; break;
-                                case 32: SpriteID = "Halfface"; X = 4; Y = 2; break;
+                                case 32: SpriteID = "HalfFace"; X = 4; Y = 2; break;
                                 case 33: SpriteID = "Pantstwo"; X = 5; Y = 2; break;
                                 case 34: SpriteID = "Goatee"; X = 6; Y = 2; break;
                                 case 35: SpriteID = "Vitiligotwo"; X = 7; Y = 2; break;
@@ -417,7 +417,7 @@ namespace Clangen.Cats
                                 case 11: SpriteID = "Minimaltwo"; X = 1; Y = 1; break;
                                 case 12: SpriteID = "Minimalthree"; X = 2; Y = 1; break;
                                 case 13: SpriteID = "Minimalfour"; X = 3; Y = 1; break;
-                                case 14: SpriteID = "Orea"; X = 4; Y = 1; break;
+                                case 14: SpriteID = "Oreo"; X = 4; Y = 1; break;
                                 case 15: SpriteID = "Swoop"; X = 5; Y = 1; break;
                                 case 16: SpriteID = "Chimera"; X = 6; Y = 1; break;
                                 case 17: SpriteID = "Chest"; X = 7; Y = 1; break;
@@ -693,20 +693,20 @@ namespace Clangen.Cats
                 case 3: SpriteID += "Adolescent0"; Y += 1; break;
                 case 4: SpriteID += "Adolescent1"; X += 1; Y += 1; break;
                 case 5: SpriteID += "Adolescent2"; X += 2; Y += 1; break;
-                case 6: SpriteID += "Young"; Y += 2; break;
-                case 7: SpriteID += "Adult"; X += 1; Y += 2; break;
-                case 8: SpriteID += "Senior"; X += 2; Y += 2; break;
+                case 6: SpriteID += "YoungShort"; Y += 2; break;
+                case 7: SpriteID += "AdultShort"; X += 1; Y += 2; break;
+                case 8: SpriteID += "SeniorShort"; X += 2; Y += 2; break;
                 case 9: SpriteID += "YoungLong"; Y += 3; break;
                 case 10: SpriteID += "AdultLong"; X += 1; Y += 3; break;
                 case 11: SpriteID += "SeniorLong"; X += 2; Y += 3; break;
-                case 12: SpriteID += "Elder"; Y += 4; break;
-                case 13: SpriteID += "ElderLong"; X += 1; Y += 4; break;
-                case 14: SpriteID += "ElderApp"; X += 2; Y += 4; break;
-                case 15: SpriteID += "AdultParalyzed"; Y += 5; break;
-                case 16: SpriteID += "YoungParalyzed"; X += 1; Y += 5; break;
-                case 17: SpriteID += "NewbornParalyzed"; X += 2; Y += 5; break;
-                case 18: SpriteID += "AdultSick"; Y += 6; break;
-                case 19: SpriteID += "YoungSick"; X += 1; Y += 6; break;
+                case 12: SpriteID += "Senior0"; Y += 4; break;
+                case 13: SpriteID += "Senior1"; X += 1; Y += 4; break;
+                case 14: SpriteID += "Senior2"; X += 2; Y += 4; break;
+                case 15: SpriteID += "ParalyzedShort"; Y += 5; break;
+                case 16: SpriteID += "ParalyzedLong"; X += 1; Y += 5; break;
+                case 17: SpriteID += "ParalyzedYoung"; X += 2; Y += 5; break;
+                case 18: SpriteID += "SickAdult"; Y += 6; break;
+                case 19: SpriteID += "SickYoung"; X += 1; Y += 6; break;
                 case 20: SpriteID += "Newborn"; X += 2; Y += 6; break;
             }
         }
@@ -715,8 +715,12 @@ namespace Clangen.Cats
         {
             get
             {
-                string[] Path = Identifier.Split('.');
-                return Spritesheets[Path[0]][$"{Path[1]}.{Path[2]}"];
+                List<string> Path = Identifier.Split('.').ToList();
+                string Root = Path[0];
+
+                Path.RemoveAt(0);
+
+                return Spritesheets[Root][string.Join(".", Path)];
             }
         }
     }

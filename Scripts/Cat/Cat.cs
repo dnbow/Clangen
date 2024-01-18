@@ -1,17 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using Clangen.Cats;
+using System;
+using System.Collections.Generic;
+using static Clangen.Utility;
 
 namespace Clangen.Managers
 {
     public class CatManager
     {
+        private static readonly Random InternalRandom = new Random(1);
         private readonly object __Lock;
-        private readonly List<Cats.Cat> KittyArray;
+        private readonly Cat[] KittyArray;
         private ushort Index;
 
         public CatManager() 
         {
             __Lock = new object();
-            KittyArray = new List<Cats.Cat>(1024);
+            KittyArray = new Cat[1024];
             Index = 0;
         }
 
@@ -26,10 +30,16 @@ namespace Clangen.Managers
             }
         }
 
-        public Cats.Cat this[ushort Identifer]
+        public Cat this[ushort Identifer]
         {
             get => KittyArray[Identifer];
-            set => KittyArray[Identifer] = value;
+        }
+
+        public Cat CreateNewCat()
+        {
+            var NewCat = new Cat(NextID, (ushort)(InternalRandom.NextDouble() * 65536));
+            KittyArray[NewCat.Identifier] = NewCat;
+            return NewCat;
         }
     }
 }
@@ -85,6 +95,9 @@ namespace Clangen.Cats
 
         public CatRef(Cat Cat)
         {
+            if (Cat is null)
+                throw new ArgumentException("Provided Cat object must be not null");
+
             Identifier = Cat.Identifier;
         }
         public CatRef(ushort Identifier)
@@ -93,7 +106,7 @@ namespace Clangen.Cats
         }
         public Cat Value
         {
-            get => Context.Clan.Cats[Identifier];
+            get => Context.Cats[Identifier];
         }
 
         public override int GetHashCode() => Identifier;
@@ -111,15 +124,16 @@ namespace Clangen.Cats
         public static bool operator !=(CatRef This, CatRef Other) => This.Identifier != Other.Identifier;
 
         public static implicit operator CatRef(Cat Value) => new CatRef(Value.Identifier);
-        public static implicit operator Cat(CatRef Value) => Value;
+        public static implicit operator Cat(CatRef Value) => Context.Cats[Value.Identifier];
     }
 
     public class Cat
     {
-        private readonly ushort Seed;
+        
         private ushort __Moons;
         private int __Experience;
 
+        public readonly ushort Seed;
         public readonly ushort Identifier;
 
         public string Prefix;
@@ -175,15 +189,23 @@ namespace Clangen.Cats
         public bool Faded;
         public bool Favourite;
         public int InCamp;
-        public Image _Sprite;
 
 
-        public Cat(ushort Seed, ushort Identifier)
+
+        public bool IsAbleToWork
+        {
+            get => true;
+        }
+
+
+        public Cat(ushort Identifier, ushort Seed)
         {
             this.Seed = Seed;
             this.Identifier = Identifier;
 
-            
+            Looks = new Looks(this);
+
+            Expand();
         }
 
         public override int GetHashCode()
@@ -197,7 +219,9 @@ namespace Clangen.Cats
 
         public void Expand()
         {
+            CRandom RNG = new CRandom(Seed);
 
+            Age = (Age)RNG.Next(7);
         }
     }
 }
