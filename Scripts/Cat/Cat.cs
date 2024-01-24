@@ -1,20 +1,21 @@
-﻿using System.Collections.Generic;
-
+﻿using Clangen.Cats;
+using System;
+using System.Collections.Generic;
+using static Clangen.Utility;
 
 namespace Clangen.Managers
 {
     public class CatManager
     {
-        private object __Lock;
-
-        private readonly List<Cats.Cat> KittyArray;
+        private static readonly Random InternalRandom = new Random(1);
+        private readonly object __Lock;
+        private readonly Cat[] KittyArray;
         private ushort Index;
 
         public CatManager() 
         {
             __Lock = new object();
-
-            KittyArray = new List<Cats.Cat>(1024);
+            KittyArray = new Cat[1024];
             Index = 0;
         }
 
@@ -29,10 +30,16 @@ namespace Clangen.Managers
             }
         }
 
-        public Cats.Cat this[ushort Identifer]
+        public Cat this[ushort Identifer]
         {
             get => KittyArray[Identifer];
-            set => KittyArray[Identifer] = value;
+        }
+
+        public Cat CreateNewCat()
+        {
+            var NewCat = new Cat(NextID, (ushort)(InternalRandom.NextDouble() * 65536));
+            KittyArray[NewCat.Identifier] = NewCat;
+            return NewCat;
         }
     }
 }
@@ -49,6 +56,11 @@ namespace Clangen.Cats
         Newborn, Kitten, Elder, Apprentice, Warrior, MediatorApprentice, Mediator, MedicineCatApprentice, MedicineCat, Deputy, Leader
     }
 
+    public enum Gender : byte
+    {
+        Male, Female
+    }
+
 
 
     public struct Pronoun
@@ -60,34 +72,6 @@ namespace Clangen.Cats
         public string Self;
         public bool Conjugate;
         // False: Plural, True: Singular
-    }
-
-
-
-    public class Looks
-    {
-        public string Name;
-        public string Colour;
-        public string Pattern;
-        public string TortieBase;
-        public string TortiePattern;
-        public string TortieColour;
-        public string WhitePatches;
-        public string EyeColour;
-        public string EyeColour2;
-        public string Vitiligo;
-        public string Length;
-        public string Points;
-        public string Accessory;
-        public string Scars;
-        public string Tint;
-        public string WhitePatchesTint;
-        public string Skin;
-
-        public byte Opacity;
-
-        public bool Paralyzed;
-        public bool Reversed;
     }
 
 
@@ -111,6 +95,9 @@ namespace Clangen.Cats
 
         public CatRef(Cat Cat)
         {
+            if (Cat is null)
+                throw new ArgumentException("Provided Cat object must be not null");
+
             Identifier = Cat.Identifier;
         }
         public CatRef(ushort Identifier)
@@ -119,7 +106,7 @@ namespace Clangen.Cats
         }
         public Cat Value
         {
-            get => Context.Clan.Cats[Identifier];
+            get => Context.Cats[Identifier];
         }
 
         public override int GetHashCode() => Identifier;
@@ -137,15 +124,16 @@ namespace Clangen.Cats
         public static bool operator !=(CatRef This, CatRef Other) => This.Identifier != Other.Identifier;
 
         public static implicit operator CatRef(Cat Value) => new CatRef(Value.Identifier);
-        public static implicit operator Cat(CatRef Value) => Value;
+        public static implicit operator Cat(CatRef Value) => Context.Cats[Value.Identifier];
     }
 
     public class Cat
     {
-        private readonly ushort Seed;
+        
         private ushort __Moons;
         private int __Experience;
 
+        public readonly ushort Seed;
         public readonly ushort Identifier;
 
         public string Prefix;
@@ -153,11 +141,16 @@ namespace Clangen.Cats
         public bool SpecialSuffixHidden;
 
         public Looks Looks;
+        public History History;
+
+        public Age Age;
+
+        public bool Gender;
+        public Gender GenderAlign;
 
         public Status Status;
         public Pronoun Pronouns;
         public Personality Personality;
-        public History History;
         public Skills Skills;
 
         public CatRef Mentor;
@@ -166,17 +159,14 @@ namespace Clangen.Cats
         public readonly Relations Relations;
         public readonly KinRelations Kin;
 
-        public Age Age;
-
         public bool Dead;
         public bool Outside;
         public bool Exiled;
 
 
-        // DETERMINING USE FOR VARIABLES BELOW
+        // DETERMINING USAGE FOR VARIABLES BELOW
         public int DeadFor;
         public bool DarkForest;
-        public string Gender;
         public string Backstory;
         public List<CatRef> Apprentice;
         public dynamic Placement;
@@ -199,15 +189,23 @@ namespace Clangen.Cats
         public bool Faded;
         public bool Favourite;
         public int InCamp;
-        public Image _Sprite;
 
 
-        public Cat(ushort Seed, ushort Identifier)
+
+        public bool IsAbleToWork
+        {
+            get => true;
+        }
+
+
+        public Cat(ushort Identifier, ushort Seed)
         {
             this.Seed = Seed;
             this.Identifier = Identifier;
 
-            
+            Looks = new Looks(this);
+
+            Expand();
         }
 
         public override int GetHashCode()
@@ -221,7 +219,9 @@ namespace Clangen.Cats
 
         public void Expand()
         {
+            CRandom RNG = new CRandom(Seed);
 
+            Age = (Age)RNG.Next(7);
         }
     }
 }

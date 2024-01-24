@@ -9,6 +9,7 @@ using Clangen.UI;
 using static Clangen.Utility;
 using System.Net.Http;
 using Clangen.Parsers;
+using static System.Net.WebRequestMethods;
 
 namespace Clangen
 {
@@ -96,6 +97,8 @@ namespace Clangen
             get => (X: X + (W / 2), Y: Y + (H / 2));
             set { X = value.X; Y = value.Y; }
         }
+
+        public override string ToString() => $"Rect({X}, {Y}, {W}, {H})";
 
         public static implicit operator SDL_Rect(Rect Value) => new SDL_Rect { x = Value.X, y = Value.Y, w = Value.W, h = Value.H };
         public static implicit operator Rect(SDL_Rect Value) => new Rect { X = Value.x, Y = Value.y, W = Value.w, H = Value.h };
@@ -236,6 +239,27 @@ namespace Clangen
     }
 
     /// <summary>
+    /// Represents a SDL_SetRenderTarget operation, made to use the using syntax
+    /// </summary>
+    public class RenderTarget : IDisposable
+    {
+        private static Stack<IntPtr> TargetStack = new Stack<IntPtr>( new IntPtr[1] { IntPtr.Zero } );
+
+        public RenderTarget(Image Target)
+        {
+            TargetStack.Push(Target);
+            SDL_SetRenderTarget(Context.Renderer, Target);
+        }
+
+
+        public void Dispose()
+        {
+            TargetStack.Pop();
+            SDL_SetRenderTarget(Context.Renderer, TargetStack.Peek());
+        }
+    }
+
+    /// <summary>
     /// Represents a SDL_Texture object in a safe context, with additional functionality
     /// </summary>
     public class Image
@@ -254,21 +278,26 @@ namespace Clangen
         public Image(IntPtr Pointer)
         {
             this.Pointer = Pointer;
-
-            SDL_QueryTexture(Pointer, out uint _, out int _, out _Rect.w, out _Rect.h);
+            Setup();
         }
-        public Image(int Width, int Height, SDL_Color? Fill = null)
+        public Image(int Width, int Height, SDL_Color? Color = null)
         {
             Pointer = SDL_CreateTexture(Context.Renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, Width, Height);
-            SDL_SetRenderTarget(Context.Renderer, Pointer);
-            SDL_SetRenderDrawColor(Context.Renderer, Fill?.r ?? 0, Fill?.g ?? 0, Fill?.b ?? 0, Fill?.a ?? 0);
-            SDL_RenderClear(Context.Renderer);
-            SDL_SetRenderTarget(Context.Renderer, IntPtr.Zero);
 
-            SDL_QueryTexture(Pointer, out uint _, out int _, out _Rect.w, out _Rect.h);
+            if (Color is not null) 
+                Fill(Color.Value);
+
+            Setup();
         }
         public Image(SDL_Color Fill) : this(Context.Window.Width, Context.Window.Height, Fill) {}
         ~Image() => Destroy();
+
+
+        private void Setup()
+        {
+            SDL_SetTextureBlendMode(Pointer, SDL_BlendMode.SDL_BLENDMODE_BLEND);
+            SDL_QueryTexture(Pointer, out uint _, out int _, out _Rect.w, out _Rect.h);
+        }
 
         public void Destroy()
         {
@@ -276,16 +305,34 @@ namespace Clangen
                 SDL_DestroyTexture(Pointer);
         }
 
-        public void Save(string Path)
-        {
-            unsafe
-            {
-                SDL_QueryTexture(Pointer, out uint format, out int _, out int W, out int H);
-                IntPtr TempTexture = SDL_CreateTexture(Context.Renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, W, H);
 
-                SDL_SetRenderTarget(Context.Renderer, TempTexture);
+
+        public void Fill(SDL_Color Value)
+        {
+            using (var Target = new RenderTarget(Pointer))
+            {
+                SDL_SetRenderDrawColor(Context.Renderer, Value.r, Value.g, Value.b, Value.a);
+                SDL_RenderClear(Context.Renderer);
+            }
+        }
+
+
+
+        public void SetBlendmode(SDL_BlendMode Mode)
+        {
+            SDL_SetTextureBlendMode(Pointer, Mode);
+        }
+
+
+        public unsafe void Save(string Path)
+        {
+            SDL_QueryTexture(Pointer, out uint format, out int _, out int W, out int H);
+            IntPtr TempTexture = SDL_CreateTexture(Context.Renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, W, H);
+
+            using (var Target = new RenderTarget(TempTexture))
+            {
                 SDL_SetRenderDrawColor(Context.Renderer, 0x00, 0x00, 0x00, 0x00);
-                SDL_RenderClear (Context.Renderer);
+                SDL_RenderClear(Context.Renderer);
 
                 SDL_RenderCopy(Context.Renderer, Pointer, IntPtr.Zero, IntPtr.Zero);
 
@@ -299,10 +346,7 @@ namespace Clangen
 
                 SDL_FreeSurface(SurfacePointer);
                 SDL_DestroyTexture(TempTexture);
-
-                SDL_SetRenderTarget(Context.Renderer, IntPtr.Zero);
             }
-
         }
 
         public static implicit operator IntPtr(Image Value) => Value == null ? IntPtr.Zero : Value.Pointer;

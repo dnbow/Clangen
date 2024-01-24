@@ -61,6 +61,8 @@ namespace Clangen
 
         public static SpriteLoader Sprites = new SpriteLoader();
 
+        public static CatManager Cats = new CatManager();
+
         /// <summary>
         /// Pointer to SDL_Renderer*
         /// </summary>
@@ -85,18 +87,18 @@ namespace Clangen
         {
             SDL_Rect srcrect, dstrect;
 
-            if (!(SourceRect is null) && !(DestinationRect is null))
+            if (SourceRect is not null && DestinationRect is not null)
             {
                 srcrect = SourceRect.Value;
                 dstrect = DestinationRect.Value;
                 SDL_RenderCopy(Renderer, Texture, ref srcrect, ref dstrect);
             }
-            else if (!(SourceRect is null) && DestinationRect is null)
+            else if (SourceRect is not null && DestinationRect is null)
             {
                 srcrect = SourceRect.Value;
                 SDL_RenderCopy(Renderer, Texture, ref srcrect, IntPtr.Zero);
             }
-            else if (SourceRect is null && !(DestinationRect is null))
+            else if (SourceRect is null && DestinationRect is not null)
             {
                 dstrect = DestinationRect.Value;
                 SDL_RenderCopy(Renderer, Texture, IntPtr.Zero, ref dstrect);
@@ -109,12 +111,41 @@ namespace Clangen
             InternalContext.RenderState |= RenderAction.Present;
         }
 
+        public static void RenderEx(Image Texture, SDL_Rect? SourceRect = null, SDL_Rect? DestinationRect = null, bool HorizontalFlip = false, bool VerticalFlip = false)
+        {
+            SDL_RendererFlip Flip = (HorizontalFlip ? SDL_RendererFlip.SDL_FLIP_HORIZONTAL : 0) | (VerticalFlip ? SDL_RendererFlip.SDL_FLIP_VERTICAL : 0);
+            SDL_Rect srcrect, dstrect;
+
+            if (SourceRect is not null && DestinationRect is not null)
+            {
+                srcrect = SourceRect.Value;
+                dstrect = DestinationRect.Value;
+                SDL_RenderCopyEx(Renderer, Texture, ref srcrect, ref dstrect, 0, IntPtr.Zero, Flip);
+            }
+            else if (SourceRect is not null && DestinationRect is null)
+            {
+                srcrect = SourceRect.Value;
+                SDL_RenderCopyEx(Renderer, Texture, ref srcrect, IntPtr.Zero, 0, IntPtr.Zero, Flip);
+            }
+            else if (SourceRect is null && DestinationRect is not null)
+            {
+                dstrect = DestinationRect.Value;
+                SDL_RenderCopyEx(Renderer, Texture, IntPtr.Zero, ref dstrect, 0, IntPtr.Zero, Flip);
+            }
+            else if (SourceRect is null && DestinationRect is null)
+            {
+                SDL_RenderCopyEx(Renderer, Texture, IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero, Flip);
+            }
+
+            InternalContext.RenderState |= RenderAction.Present;
+        }
+
         public static void RenderOnto(Image Source, Image Destination, SDL_Rect? SourceRect = null, SDL_Rect? DestinationRect = null)
         {
-            IntPtr PrevTarget = SDL_GetRenderTarget(Renderer);
-            SDL_SetRenderTarget(Renderer, Destination);
-            Render(Source, SourceRect, DestinationRect);
-            SDL_SetRenderTarget(Renderer, PrevTarget);
+            using (var Target = new RenderTarget(Destination))
+            {
+                Render(Source, SourceRect, DestinationRect);
+            }
         }
         
 
@@ -256,7 +287,7 @@ namespace Clangen
                         break;
                 }
 
-                Context.Screens.Current.Tick(Event);
+                Context.Screens.Current?.Tick(Event);
             }
         }
     } 

@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Clangen.Parsers
 {
     public static class Eval
     {
+        public static object EvalNull = new object();
+
         public static object StringToObject(string Value) // NEED TO OPTIMISE DESPERATELY
         {
             string Internal = Value.Trim();
@@ -18,28 +21,34 @@ namespace Clangen.Parsers
                 case "False":
                     return false;
 
+                case "null":
+                case "Null":
+                    return null;
+
                 default:
                     break;
             }
 
-            if (Value.StartsWith("\"") && Value.EndsWith("\"") || Value.StartsWith("'") && Value.EndsWith("'"))
+
+
+            if (Internal.StartsWith("\"") && Internal.EndsWith("\"") || Internal.StartsWith("'") && Internal.EndsWith("'"))
             {
-                Internal = Value.Substring(1, Value.Length - 2);
+                Internal = Internal.Substring(1, Internal.Length - 2);
                 if (Internal.StartsWith("#"))
-                    return new Color(Value);
+                    return new Color(Internal);
 
                 return Internal;
             }
-            else if (Value.All(c => 47 < c && c < 58))
+            else if (Internal.All(c => 47 < c && c < 58))
             {
-                return int.Parse(Value);
+                return int.Parse(Internal);
             }
-            else if (Value.All(c => 47 < c && c < 58 || c == 46) || Value.Contains("."))
+            else if (Internal.All(c => 47 < c && c < 58 || c == 46) || Internal.Contains("."))
             {
-                return double.Parse(Value);
+                return double.Parse(Internal);
             }
 
-            return null; // Fallthrough fallacy -> we can check if this wasnt set easily
+            return EvalNull; // Fallthrough fallacy -> we can check if this wasnt set easily
         }
     }
 }

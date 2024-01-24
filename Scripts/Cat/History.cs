@@ -1,26 +1,18 @@
-﻿
-
-using Clangen.Cats;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Clangen.Cats
 {
     public readonly struct HistoryStamp
     {
-        public readonly CatRef Cat;
+        public readonly CatRef Source;
         public readonly ushort Start;
         public readonly ushort End;
 
-        public HistoryStamp(CatRef Cat, ushort Start, ushort End)
+        public HistoryStamp(CatRef Source, ushort Start, ushort End)
         {
-            this.Cat = Cat;
+            this.Source = Source;
             this.Start = Start;
             this.End = End;
-        }
-
-        public ushort Duration
-        {
-            get => (ushort)(End - Start);
         }
     }
 
