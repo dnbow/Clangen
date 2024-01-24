@@ -255,7 +255,6 @@ namespace Clangen.UI
 
             using (var Texture = new RenderTarget(_Texture))
             {
-
                 if (Background is not null)
                     Context.Render(Background, null, Background.Rect);
 

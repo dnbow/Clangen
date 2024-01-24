@@ -6,10 +6,8 @@ using static SDL2.SDL;
 using static SDL2.SDL_ttf;
 using static SDL2.SDL_image;
 using Clangen.UI;
-using static Clangen.Utility;
-using System.Net.Http;
 using Clangen.Parsers;
-using static System.Net.WebRequestMethods;
+using static Clangen.Utility;
 
 namespace Clangen
 {
@@ -55,7 +53,7 @@ namespace Clangen
 
         public uint Value
         {
-            get => (uint)((Red << 24) | (Green << 16) | (Blue << 8) | Alpha);
+            readonly get => (uint)((Red << 24) | (Green << 16) | (Blue << 8) | Alpha);
             set
             {
                 Red = (byte)((value & 0xFF000000) >> 24);
@@ -65,7 +63,7 @@ namespace Clangen
             }
         }
 
-        public override string ToString() => $"Color({Red}, {Green}, {Blue}, {Alpha})";
+        public override readonly string ToString() => $"Color({Red}, {Green}, {Blue}, {Alpha})";
         public static implicit operator SDL_Color(Color Value) => new SDL_Color() { r = Value.Red, b = Value.Blue, g = Value.Green, a = Value.Alpha };
         public static implicit operator Color(SDL_Color Value) => new Color(Value.r, Value.g, Value.b, Value.a);
     }
@@ -82,23 +80,23 @@ namespace Clangen
         public int H;
 
         public int R
-        {
-            get => X + W;
+        { 
+            readonly get => X + W;
             set => W = value - X;
         }
         public int B
-        {
-            get => Y + H;
+        { 
+            readonly get => Y + H;
             set => H = value - Y;
         }
 
         public (int X, int Y) Center
         {
-            get => (X: X + (W / 2), Y: Y + (H / 2));
+            readonly get => (X: X + (W / 2), Y: Y + (H / 2));
             set { X = value.X; Y = value.Y; }
         }
 
-        public override string ToString() => $"Rect({X}, {Y}, {W}, {H})";
+        public override readonly string ToString() => $"Rect({X}, {Y}, {W}, {H})";
 
         public static implicit operator SDL_Rect(Rect Value) => new SDL_Rect { x = Value.X, y = Value.Y, w = Value.W, h = Value.H };
         public static implicit operator Rect(SDL_Rect Value) => new Rect { X = Value.x, Y = Value.y, W = Value.w, H = Value.h };
@@ -151,7 +149,7 @@ namespace Clangen
             get => (ActiveFlags & SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
         }
 
-        public bool Exists => Pointer != null;
+        public bool Exists => Pointer != IntPtr.Zero;
 
         public Window(string Title, int X, int Y, int W, int H, SDL_WindowFlags? flags = null)
         {
@@ -204,19 +202,19 @@ namespace Clangen
         {
             get
             {
-                SDL_GetRendererInfo(Pointer, out SDL_RendererInfo info);
+                SDL_GetRendererInfo(Pointer, out SDL_RendererInfo Info);
                 return Info;
             }
         }
 
         private readonly IntPtr Pointer;
 
-        public bool Exists => Pointer != null;
+        public bool Exists => Pointer != IntPtr.Zero;
 
         public Renderer(Window window, SDL_RendererFlags? flags = null)
         {
             Pointer = SDL_CreateRenderer(window, -1, (flags ?? DEFAULT_FLAGS));
-            if (Pointer == null)
+            if (Pointer == IntPtr.Zero)
             {
                 Log($"Error on Renderer creation: {SDL_GetError()}");
                 return;
@@ -243,7 +241,7 @@ namespace Clangen
     /// </summary>
     public class RenderTarget : IDisposable
     {
-        private static Stack<IntPtr> TargetStack = new Stack<IntPtr>( new IntPtr[1] { IntPtr.Zero } );
+        private static readonly Stack<IntPtr> TargetStack = new Stack<IntPtr>( new IntPtr[1] { IntPtr.Zero } );
 
         public RenderTarget(Image Target)
         {
@@ -266,31 +264,43 @@ namespace Clangen
     {
         private readonly IntPtr Pointer;
         private SDL_Rect _Rect;
+        private bool Persistant;
+
+        public readonly static List<Image> References = new List<Image>(65536);
 
         public SDL_Rect Rect => _Rect;
 
-        public Image(string Path)
+        public Image(string Path, bool Persistant = false)
         {
             Pointer = IMG_LoadTexture(Context.Renderer, Path);
+            this.Persistant = Persistant;
 
             SDL_QueryTexture(Pointer, out uint _, out int _, out _Rect.w, out _Rect.h);
         }
-        public Image(IntPtr Pointer)
+        public Image(IntPtr Pointer, bool Persistant = false)
         {
             this.Pointer = Pointer;
+            this.Persistant = Persistant;
             Setup();
         }
-        public Image(int Width, int Height, SDL_Color? Color = null)
+        public Image(int Width, int Height, SDL_Color? Color = null, bool Persistant = false)
         {
             Pointer = SDL_CreateTexture(Context.Renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, Width, Height);
+            this.Persistant = Persistant;
 
             if (Color is not null) 
                 Fill(Color.Value);
 
             Setup();
         }
-        public Image(SDL_Color Fill) : this(Context.Window.Width, Context.Window.Height, Fill) {}
-        ~Image() => Destroy();
+        public Image(SDL_Color Fill, bool Persistant) : this(Context.Window.Width, Context.Window.Height, Fill, Persistant) {}
+        ~Image()
+        {
+            if (false && !Persistant)
+                Destroy();
+
+            References.Add(this);
+        }
 
 
         private void Setup()
@@ -301,7 +311,7 @@ namespace Clangen
 
         public void Destroy()
         {
-            if (Pointer != null)
+            if (Pointer != IntPtr.Zero)
                 SDL_DestroyTexture(Pointer);
         }
 
@@ -309,11 +319,9 @@ namespace Clangen
 
         public void Fill(SDL_Color Value)
         {
-            using (var Target = new RenderTarget(Pointer))
-            {
-                SDL_SetRenderDrawColor(Context.Renderer, Value.r, Value.g, Value.b, Value.a);
-                SDL_RenderClear(Context.Renderer);
-            }
+            using var Target = new RenderTarget(Pointer);
+            SDL_SetRenderDrawColor(Context.Renderer, Value.r, Value.g, Value.b, Value.a);
+            SDL_RenderClear(Context.Renderer);
         }
 
 
@@ -329,24 +337,22 @@ namespace Clangen
             SDL_QueryTexture(Pointer, out uint format, out int _, out int W, out int H);
             IntPtr TempTexture = SDL_CreateTexture(Context.Renderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, W, H);
 
-            using (var Target = new RenderTarget(TempTexture))
-            {
-                SDL_SetRenderDrawColor(Context.Renderer, 0x00, 0x00, 0x00, 0x00);
-                SDL_RenderClear(Context.Renderer);
+            using var Target = new RenderTarget(TempTexture);
+            SDL_SetRenderDrawColor(Context.Renderer, 0x00, 0x00, 0x00, 0x00);
+            SDL_RenderClear(Context.Renderer);
 
-                SDL_RenderCopy(Context.Renderer, Pointer, IntPtr.Zero, IntPtr.Zero);
+            SDL_RenderCopy(Context.Renderer, Pointer, IntPtr.Zero, IntPtr.Zero);
 
-                IntPtr SurfacePointer = SDL_CreateRGBSurface(0, W, H, 32, 0xFF000000, 0xFF0000, 0xFF00, 0xFF);
-                SDL_Surface* Surface = (SDL_Surface*)SurfacePointer;
-                SDL_Rect SurfaceRect = new SDL_Rect { x = 0, y = 0, w = W, h = H };
+            IntPtr SurfacePointer = SDL_CreateRGBSurface(0, W, H, 32, 0xFF000000, 0xFF0000, 0xFF00, 0xFF);
+            SDL_Surface* Surface = (SDL_Surface*)SurfacePointer;
+            SDL_Rect SurfaceRect = new SDL_Rect { x = 0, y = 0, w = W, h = H };
 
-                SDL_RenderReadPixels(Context.Renderer, ref SurfaceRect, SDL_PIXELFORMAT_RGBA8888, Surface->pixels, Surface->pitch);
+            SDL_RenderReadPixels(Context.Renderer, ref SurfaceRect, SDL_PIXELFORMAT_RGBA8888, Surface->pixels, Surface->pitch);
 
-                IMG_SavePNG(SurfacePointer, Path);
+            IMG_SavePNG(SurfacePointer, Path);
 
-                SDL_FreeSurface(SurfacePointer);
-                SDL_DestroyTexture(TempTexture);
-            }
+            SDL_FreeSurface(SurfacePointer);
+            SDL_DestroyTexture(TempTexture);
         }
 
         public static implicit operator IntPtr(Image Value) => Value == null ? IntPtr.Zero : Value.Pointer;
@@ -371,7 +377,7 @@ namespace Clangen
 
         public void Destroy()
         {
-            if (Face != null)
+            if (Face != IntPtr.Zero)
             {
                 TTF_CloseFont(Face);
                 Face = IntPtr.Zero;
@@ -380,7 +386,7 @@ namespace Clangen
 
         public Image Render(string Text, int Size = -1)
         {
-            return IntPtr.Zero; // TEMPRY
+            return IntPtr.Zero; // TEMP
         }
         public Image Render(string Text, SDL_Rect BoundingBox, int? Size = null, SDL_Color? Color = null)
         {
@@ -405,7 +411,7 @@ namespace Clangen
     public class ThemeTemplate
     {
         public string Name;
-        private Dictionary<string, object> Fields = new Dictionary<string, object>(); // Didnt want to make it so ambiguous but if i dont then everything needs to be statically typed which makes it stinky for modders
+        private readonly Dictionary<string, object> Fields = new Dictionary<string, object>(); // Didnt want to make it so ambiguous but if i dont then everything needs to be statically typed which makes it stinky for modders
 
         public ThemeTemplate(Dictionary<string, object> Fields)
         {
@@ -532,7 +538,6 @@ namespace Clangen
                     else
                         ArrayHistory.Add(idx);
 
-                    value.Construct();
                     InternalContext.RenderState |= RenderAction.Rebuild;
                 }
             }
@@ -543,7 +548,7 @@ namespace Clangen
                     .SelectMany(assembly => assembly.GetTypes())
                     .Where(type => typeof(IScreen).IsAssignableFrom(type) && type != typeof(IScreen))
                     .Select(type => Activator.CreateInstance(type) as IScreen)
-                    .Where(instance => !(instance is null)).ToArray();
+                    .Where(instance => instance is not null).ToArray();
             }
 
             public void SetScreen(string ID)

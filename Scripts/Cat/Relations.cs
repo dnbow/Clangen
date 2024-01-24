@@ -1,11 +1,22 @@
-﻿using System.Collections.Generic;
-
+﻿using Newtonsoft.Json.Bson;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Clangen.Cats
 {
+    public enum GriefType : byte
+    {
+        None, Minor, Major
+    }
+
     public enum RelationDynamic : byte
     {
-        None, Mate, Family, Parents
+        None, Mate, Sibling, Child, Parent
+    }
+
+    public enum RelationFacet : byte
+    {
+        Romantic, Platonic, Trust, Admiration, Comfortable, Jealousy, Dislike
     }
 
     public struct Relation
@@ -13,8 +24,8 @@ namespace Clangen.Cats
         public RelationDynamic Dynamic;
         public byte Romantic;
         public byte Platonic;
-        public byte Trust;
         public byte Admiration;
+        public byte Trust;
         public byte Comfortable;
         public byte Jealousy;
         public byte Dislike;
@@ -23,7 +34,7 @@ namespace Clangen.Cats
     public class Relations
     {
         private readonly CatRef Source;
-        private readonly Dictionary<ushort, Relation> Map;
+        private readonly Dictionary<CatRef, Relation> Map;
 
         /// <summary>
         /// A List of this Cats current Mates
@@ -45,7 +56,7 @@ namespace Clangen.Cats
             {
                 List<CatRef> Cats = new List<CatRef>();
 
-                Cat Cat = Source.Value;
+                Cat Cat = Source;
 
                 for (int i = 0; i < Parents.Count; i++)
                 {
@@ -59,9 +70,36 @@ namespace Clangen.Cats
             }
         }
 
+
+        public int Count
+        {
+            get => Map.Count;
+        }
+
+
+        public CatRef[] Cats()
+        {
+            return Map.Keys.ToArray();
+        }
+
+
         public Relations()
         {
-            Map = new Dictionary<ushort, Relation>();
+            Map = new Dictionary<CatRef, Relation>();
+        }
+
+
+
+        public Relation this[CatRef Cat]
+        {
+            get => Map[Cat];
+        }
+
+
+
+        public void Clear()
+        {
+
         }
     }
 

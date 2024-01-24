@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using static SDL2.SDL;
 using static Clangen.Utility;
+using System.Collections.ObjectModel;
+using YamlDotNet.Core.Tokens;
 
 namespace Clangen.Cats
 {
@@ -40,130 +42,130 @@ namespace Clangen.Cats
 
 
 
-    public static class LooksGroups // ENTIRELY VERY temporary
+    public static class LooksGroups // ENTIRELY VERY TEMP
     {
-        public static string[] EyeColours = {
-            "Yellow", "Amber", "Hazel", "Palegreen", "Green", "Blue", "Darkblue", "Grey", "Cyan", "Emerald", 
-            "Paleblue", "Paleyellow", "Gold", "Heatherblue", "Copper", "Sage", "Cobalt", "Sunlitice", "Greenyellow", "Bronze", 
+        public static readonly string[] EyeColours = {
+            "Yellow", "Amber", "Hazel", "Palegreen", "Green", "Blue", "Darkblue", "Grey", "Cyan", "Emerald",
+            "Paleblue", "Paleyellow", "Gold", "Heatherblue", "Copper", "Sage", "Cobalt", "Sunlitice", "Greenyellow", "Bronze",
             "Silver"
         };
-        public static string[] YellowEyes = {
+        public static readonly string[] YellowEyes = {
             "Yellow", "Amber", "Paleyellow", "Gold", "Copper", "Greenyellow", "Bronze", "Silver"
         };
-        public static string[] BlueEyes = {
+        public static readonly string[] BlueEyes = {
             "Blue", "Darkblue", "Cyan", "Paleblue", "Heatherblue", "Cobalt", "Sunlitice", "Grey"
         };
-        public static string[] GreenEyes = {
+        public static readonly string[] GreenEyes = {
             "Palegreen", "Green", "Emerald", "Sage", "Hazel"
         };
 
-        public static string[] Vitiligo = { "Vitiligo", "Vitiligotwo", "Moon", "Phantom", "Karpati", "Powder", "Bleached", "Smokey" };
+        public static readonly string[] Vitiligo = { 
+            "Vitiligo", "Vitiligotwo", "Moon", "Phantom", "Karpati", "Powder", "Bleached", "Smokey" 
+        };
 
-        public static string[] TortieBases = { 
+        public static readonly string[] TortieBases = {
             "Single", "Tabby", "Bengal", "Marbled", "Ticked", "Smoke", "Rosette", "Speckled", "Mackerel", "Classic", "Sokoke", "Agouti", "Singlestripe", "Masked"
         };
-        public static string[] TortiePatterns = { 
-            "One", "Two", "Three", "Four", "Redtail", "Delilah", "Minimalone", "Minimaltwo", "Minimalthree", "Minimalfour", "Half", "Oreo", "Swoop", "Mottled", "Sidemask", "Eyedot", "Bandana", "Pacman", "Streamstrike", 
-            "Oriole", "Chimera", "Daub", "Ember", "Blanket", "Robin", "Brindle", "Paige", "Rosetail", "Safi", "Smudged", "Dapplenight", "Streak", "Mask", "Chest", "Armtail", "Smoke", "Grumpyface", "Brie", "Beloved", 
+        public static readonly string[] TortiePatterns = {
+            "One", "Two", "Three", "Four", "Redtail", "Delilah", "Minimalone", "Minimaltwo", "Minimalthree", "Minimalfour", "Half", "Oreo", "Swoop", "Mottled", "Sidemask", "Eyedot", "Bandana", "Pacman", "Streamstrike",
+            "Oriole", "Chimera", "Daub", "Ember", "Blanket", "Robin", "Brindle", "Paige", "Rosetail", "Safi", "Smudged", "Dapplenight", "Streak", "Mask", "Chest", "Armtail", "Smoke", "Grumpyface", "Brie", "Beloved",
             "Body", "Shiloh", "Freckled", "Heartbeat"
         };
 
-        public static string[] PeltColours = { 
-            "White", "Palegrey", "Silver", "Grey", "Darkgrey", "Ghost", "Black", "Cream", "Paleginger", "Golden", "Ginger", "Darkginger", "Sienna", "Lightbrown", "Lilac", "Brown", "Goldenbrown", "Darkbrown", "Chocolate"
-        };
+        public static readonly PeltColour[] PeltColours = Enum.GetValues(typeof(PeltColour)).Cast<PeltColour>().ToArray();
 
-        public static string[] Tabbies = { "Tabby", "Ticked", "Mackerel", "Classic", "Sokoke", "Agouti" };
-        public static string[] Spotted = { "Speckled", "Rosette" };
-        public static string[] Plain = { "SingleColour", "Singlestripe", "TwoColour", "Smoke" };
-        public static string[] Exotic = { "Bengal", "Marbled", "Masked" };
-        public static string[] Torties = { "Tortie", "Calico" };
-        public static string[][] PeltCategories = { Tabbies, Spotted, Plain, Exotic, Torties };
+        public static readonly string[] Tabbies = { "Tabby", "Ticked", "Mackerel", "Classic", "Sokoke", "Agouti" };
+        public static readonly string[] Spotted = { "Speckled", "Rosette" };
+        public static readonly string[] Plain = { "SingleColour", "Singlestripe", "TwoColour", "Smoke" };
+        public static readonly string[] Exotic = { "Bengal", "Marbled", "Masked" };
+        public static readonly string[] Torties = { "Tortie", "Calico" };
+        public static readonly string[][] PeltCategories = { Tabbies, Spotted, Plain, Exotic, Torties };
 
-        public static string[] GingerColours = { "Cream", "Paleginger", "Golden", "Ginger", "Darkginger", "Sienna" };
-        public static string[] BlackColours = { "Grey", "Darkgrey", "Ghost", "Black" };
-        public static string[] WhiteColours = { "White", "Palegrey", "Silver" };
-        public static string[] BrownColours = { "Lightbrown", "Lilac", "Brown", "Goldenbrown", "Darkbrown", "Chocolate" };
-        public static string[][] ColourCategories = { GingerColours, BlackColours, WhiteColours, BrownColours };
+        public static readonly PeltColour[] GingerColours = { PeltColour.Cream, PeltColour.Paleginger, PeltColour.Golden, PeltColour.Ginger, PeltColour.Darkginger, PeltColour.Sienna };
+        public static readonly PeltColour[] BlackColours = { PeltColour.Grey, PeltColour.Darkgrey, PeltColour.Ghost, PeltColour.Black };
+        public static readonly PeltColour[] WhiteColours = { PeltColour.White, PeltColour.Palegrey, PeltColour.Silver };
+        public static readonly PeltColour[] BrownColours = { PeltColour.Lightbrown, PeltColour.Lilac, PeltColour.Brown, PeltColour.Goldenbrown, PeltColour.Darkbrown, PeltColour.Chocolate };
+        public static readonly PeltColour[][] ColourCategories = { GingerColours, BlackColours, WhiteColours, BrownColours };
 
-        public static string[] PointMarkings = { "Colourpoint", "Ragdoll", "Sepiapoint", "Minkpoint", "Sealpoint" };
+        public static readonly string[] PointMarkings = { "Colourpoint", "Ragdoll", "Sepiapoint", "Minkpoint", "Sealpoint" };
 
-        public static string[] LittleWhite = {
-            "Little", "LightTuxedo", "Buzzardfang", "Tip", "Blaze", "Bib", "Vee", "Paws", "Belly", "Tailtip", "Toes", "Brokenblaze", "Liltwo", "Scourge", "Toestail", "Ravenpaw", 
+        public static readonly string[] LittleWhite = {
+            "Little", "LightTuxedo", "Buzzardfang", "Tip", "Blaze", "Bib", "Vee", "Paws", "Belly", "Tailtip", "Toes", "Brokenblaze", "Liltwo", "Scourge", "Toestail", "Ravenpaw",
             "Honey", "Luna", "Extra", "Mustache", "Reverseheart", "Sparkle", "Rightear", "Leftear", "Estrella", "ReverseEye", "Backspot", "Eyebags", "Locket", "Blazemask", "Tears"
         };
-        public static string[] MiddleWhite = {
+        public static readonly string[] MiddleWhite = {
             "Tuxedo", "Fancy", "Unders", "Damien", "Skunk", "Mitaine", "Squeaks", "Star", "Wings", "Diva", "Savannah", "Fadespots", "Beard", "Dapplepaw", "Topcover", "Woodpecker",
             "Miss", "Bowtie", "Vest", "Fadebelly", "Digit", "Fctwo", "Fcone", "Mia", "Rosina", "Princess", "Dougie"
         };
-        public static string[] HighWhite = {
-            "Any", "Anytwo", "Broken", "Freckles", "Ringtail", "HalfFace", "Pantstwo", "Goatee", "Prince", "Farofa", "Mister", "Pants", "Reversepants", "Halfwhite", "Appaloosa", "Piebald", 
+        public static readonly string[] HighWhite = {
+            "Any", "Anytwo", "Broken", "Freckles", "Ringtail", "HalfFace", "Pantstwo", "Goatee", "Prince", "Farofa", "Mister", "Pants", "Reversepants", "Halfwhite", "Appaloosa", "Piebald",
             "Curved", "Glass", "Maskmantle", "Mao", "Painted", "Shibainu", "Owl", "Bub", "Sparrow", "Trixie", "Sammy", "Front", "Blossomstep", "Bullseye", "Finn", "Scar", "Buster",
             "Hawkblaze", "Cake"
         };
-        public static string[] MostlyWhite = {
-            "Van", "OneEar", "Lightsong", "Tail", "Heart", "Moorish", "Apron", "Capsaddle", "Chestspeck", "Blackstar", "Petal", "HeartTwo", "Pebbleshine", "Boots", "Cow", "Cowtwo", "Lovebug", 
+        public static readonly string[] MostlyWhite = {
+            "Van", "OneEar", "Lightsong", "Tail", "Heart", "Moorish", "Apron", "Capsaddle", "Chestspeck", "Blackstar", "Petal", "HeartTwo", "Pebbleshine", "Boots", "Cow", "Cowtwo", "Lovebug",
             "Shootingstar", "Eyespot", "Pebble", "Tailtwo", "Buddy", "Kropka"
         };
 
-        public static string[] SkinSprites = {
+        public static readonly string[] SkinSprites = {
             "Black", "Pink", "Darkbrown", "Brown", "Lightbrown", "Dark", "Darkgrey", "Grey", "Darksalmon",
             "Salmon", "Peach", "Darkmarbled", "Marbled", "Lightmarbled", "Darkblue", "Blue", "Lightblue", "Red"
         };
 
-        public static string[] Scars = {
-            "One", "Two", "Three", "Tailscar", "Snout", "Cheek", "Side", "Throat", "Tailbase", "Belly", 
-            "Legbite", "Neckbite", "Face", "Manleg", "Brightheart", "Mantail", "Bridge", "Rightblind", "Leftblind", "Bothblind", 
+        public static readonly string[] Scars = {
+            "One", "Two", "Three", "Tailscar", "Snout", "Cheek", "Side", "Throat", "Tailbase", "Belly",
+            "Legbite", "Neckbite", "Face", "Manleg", "Brightheart", "Mantail", "Bridge", "Rightblind", "Leftblind", "Bothblind",
             "Beakcheek", "Beaklower", "Catbite", "Ratbite", "Quillchunk", "Quillscratch"
         };
-        public static string[] MissingScars = {
+        public static readonly string[] MissingScars = {
             "Leftear", "Rightear", "Notail", "Halftail", "Nopaw", "Noleftear", "Norightear", "Noear"
         };
-        public static string[] SpecialScars = {
+        public static readonly string[] SpecialScars = {
             "Snake", "Toetrap", "Burnpaws", "Burntail", "Burnbelly", "Burnrump", "Frostface", "FrostTail", "Frostmitt"
         };
 
-        public static string[] PlantAccessories = {
-            "Mapleleaf", "Holly", "Blueberries", "Forgetmenots", "Ryestalk", "Laurel", "Bluebells", "Nettle", "Poppy", "Lavender", 
+        public static readonly string[] PlantAccessories = {
+            "Mapleleaf", "Holly", "Blueberries", "Forgetmenots", "Ryestalk", "Laurel", "Bluebells", "Nettle", "Poppy", "Lavender",
             "Herbs", "Petals", "Dryherbs", "Oakleaves", "Catmint", "Mapleseed", "Juniper"
         };
-        public static string[] WildAccessories = {
+        public static readonly string[] WildAccessories = {
             "Redfeathers", "Bluefeathers", "Jayfeathers", "Mothwings", "Cicadawings"
         };
 
 
-        public static string[] Collars = {
+        public static readonly string[] Collars = {
             "Crimson", "Blue", "Yellow", "Cyan", "Red", "Lime", "Green", "Rainbow", "Black", "Spikes", "White", "Pink", "Purple", "Multi", "Indigo"
         };
     }
 
 
 
-    public static class Tints // VERY TEMPORARY inplace of dynamic tints
+    public static class Tints // TEMP inplace of dynamic tints
     {
-        public static Dictionary<string, string> ColourGroups = new Dictionary<string, string>()
+        public static readonly Dictionary<PeltColour, string> ColourGroups = new Dictionary<PeltColour, string>()
         {
-            { "White", "White" },
-            { "Palegrey", "Cool" },
-            { "Silver", "Cool" },
-            { "Grey", "Monochrome" },
-            { "Darkgrey", "Monochrome" },
-            { "Ghost", "Monochrome" },
-            { "Black", "Monochrome" },
-            { "Cream", "Warm" },
-            { "Paleginger", "Warm" },
-            { "Golden", "Warm" },
-            { "Ginger", "Warm" },
-            { "Darkginger", "Warm" },
-            { "Sienna", "Brown" },
-            { "Lightbrown", "Brown" },
-            { "Lilac", "Brown" },
-            { "Brown", "Brown" },
-            { "Goldenbrown", "Brown" },
-            { "Darkbrown", "Brown" },
-            { "Chocolate", "Brown" },
+            { PeltColour.White, "White" },
+            { PeltColour.Palegrey, "Cool" },
+            { PeltColour.Silver, "Cool" },
+            { PeltColour.Grey, "Monochrome" },
+            { PeltColour.Darkgrey, "Monochrome" },
+            { PeltColour.Ghost, "Monochrome" },
+            { PeltColour.Black, "Monochrome" },
+            { PeltColour.Cream, "Warm" },
+            { PeltColour.Paleginger, "Warm" },
+            { PeltColour.Golden, "Warm" },
+            { PeltColour.Ginger, "Warm" },
+            { PeltColour.Darkginger, "Warm" },
+            { PeltColour.Sienna, "Brown" },
+            { PeltColour.Lightbrown, "Brown" },
+            { PeltColour.Lilac, "Brown" },
+            { PeltColour.Brown, "Brown" },
+            { PeltColour.Goldenbrown, "Brown" },
+            { PeltColour.Darkbrown, "Brown" },
+            { PeltColour.Chocolate, "Brown" },
         };
 
-        public static Dictionary<string, string[]> PossibleTints = new Dictionary<string, string[]>
+        public static readonly Dictionary<string, string[]> PossibleTints = new Dictionary<string, string[]>
         {
             { "Basic", new string[]{ "Pink", "Grey", "Red", "Orange" } },
             { "Warm", new string[]{ "Yellow", "Purple" } },
@@ -173,7 +175,7 @@ namespace Clangen.Cats
             { "Brown", new string[]{ "Yellow", "Purple", "Black" } }
         };
 
-        public static Dictionary<string, Color> Colors = new Dictionary<string, Color>()
+        public static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
         {
             { "Pink", new Color(253, 237, 237) },
             { "Grey", new Color(225, 225, 225) },
@@ -187,29 +189,29 @@ namespace Clangen.Cats
 
         public static class WhitePatches
         {
-            public static Dictionary<string, string> ColourGroups = new Dictionary<string, string>()
+            public static readonly Dictionary<PeltColour, string> ColourGroups = new Dictionary<PeltColour, string>()
             {
-                { "Palegrey", "Grey" },
-                { "Silver", "Grey" },
-                { "Grey", "Grey" },
-                { "Darkgrey", "Black" },
-                { "Ghost", "Black" },
-                { "Black", "Black" },
-                { "Cream", "Ginger" },
-                { "Paleginger", "Ginger" },
-                { "Golden", "Ginger" },
-                { "Ginger", "Ginger" },
-                { "Darkginger", "Ginger" },
-                { "Sienna", "Ginger" },
-                { "Lightbrown", "Brown" },
-                { "Lilac", "Brown" },
-                { "Brown", "Brown" },
-                { "Goldenbrown", "Brown" },
-                { "Darkbrown", "Brown" },
-                { "Chocolate", "Brown" },
+                { PeltColour.Palegrey, "Grey" },
+                { PeltColour.Silver, "Grey" },
+                { PeltColour.Grey, "Grey" },
+                { PeltColour.Darkgrey, "Black" },
+                { PeltColour.Ghost, "Black" },
+                { PeltColour.Black, "Black" },
+                { PeltColour.Cream, "Ginger" },
+                { PeltColour.Paleginger, "Ginger" },
+                { PeltColour.Golden, "Ginger" },
+                { PeltColour.Ginger, "Ginger" },
+                { PeltColour.Darkginger, "Ginger" },
+                { PeltColour.Sienna, "Ginger" },
+                { PeltColour.Lightbrown, "Brown" },
+                { PeltColour.Lilac, "Brown" },
+                { PeltColour.Brown, "Brown" },
+                { PeltColour.Goldenbrown, "Brown" },
+                { PeltColour.Darkbrown, "Brown" },
+                { PeltColour.Chocolate, "Brown" },
             };
 
-            public static Dictionary<string, string[]> PossibleTints = new Dictionary<string, string[]>()
+            public static readonly Dictionary<string, string[]> PossibleTints = new Dictionary<string, string[]>()
             {
                 { "Basic", new string[]{ "Offwhite" } },
                 { "Black", new string[]{ "Grey", "Darkcream", "Cream" } },
@@ -218,7 +220,7 @@ namespace Clangen.Cats
                 { "Brown", new string[]{ "Darkcream", "Cream" } }
             };
 
-            public static Dictionary<string, Color> Colors = new Dictionary<string, Color>()
+            public static readonly Dictionary<string, Color> Colors = new Dictionary<string, Color>()
             {
                 { "Darkcream", new Color(236, 229, 208) },
                 { "Cream", new Color(247, 241, 225) },
@@ -229,20 +231,81 @@ namespace Clangen.Cats
         }
     }
 
+    public enum PeltType : byte
+    {
+        SingleColour,
+        TwoColour,
+        Tortie,
+        Calico
+    }
 
+    public readonly struct Pelt
+    {
+        public readonly string Name;
+        public readonly byte Value;
+
+        /// <summary>
+        /// A bool representing whether or not this Pelt is allowed to be used as a TortieBase
+        /// </summary>
+        public readonly bool AllowedBase;
+        
+    }
+
+    public enum PeltColour : byte
+    {
+        None,
+        White,
+        Palegrey,
+        Silver,
+        Grey,
+        Darkgrey,
+        Ghost,
+        Black,
+        Cream,
+        Paleginger,
+        Golden,
+        Ginger,
+        Darkginger,
+        Sienna,
+        Lightbrown,
+        Lilac,
+        Brown,
+        Goldenbrown,
+        Darkbrown,
+        Chocolate
+    }
+
+    public struct EyeColour
+    {
+
+    }
+
+    public enum ScarType : byte
+    {
+        Normal, Missing, Special
+    }
+
+    public readonly struct Scar
+    {
+        public readonly string Name;
+        public readonly byte Value;
+        public readonly ScarType Type;
+    }
 
 
     public class Looks
     {
         private readonly CatRef Source;
 
+        public PeltType PeltType;
+
         public string Name;
-        public string Colour;
+        public PeltColour Colour;
         public string Pattern;
         public PeltLength Length;
         public string TortieBase;
         public string TortiePattern;
-        public string TortieColour;
+        public PeltColour TortieColour;
         public string WhitePatches;
         public string EyeColour;
         public string EyeColour2;
@@ -288,9 +351,9 @@ namespace Clangen.Cats
             string ChosenPelt = RNG.ChooseFrom(
                 RNG.ChooseFrom(LooksGroups.PeltCategories, new int[] { 35, 20, 30, 15, 0 })
             );
-            string ChosenPeltColour = RNG.ChooseFrom(RNG.ChooseFrom(LooksGroups.ColourCategories));
+            PeltColour ChosenPeltColour = RNG.ChooseFrom(RNG.ChooseFrom(LooksGroups.ColourCategories));
             string ChosenTortieBase = null;
-            int TortieChanceFemale = 3, TortieChanceMale = 13; // GAMECONFIGCHANCE
+            int TortieChanceFemale = 3, TortieChanceMale = 13; // CONFIG
 
             if (RNG.Next(1 << (Source.Value.Gender ? TortieChanceMale : TortieChanceFemale)) == 0)
             {
@@ -314,9 +377,9 @@ namespace Clangen.Cats
 
 
 
-        public void RandomizeWhitePatches(CRandom RNG, bool IsWhite)
+        public void RandomizeWhitePatches(CRandom RNG)
         {
-            if (Name != "Tortie" && RNG.Next(5) == 0) // GAMECONFIGCHANCE
+            if (Name != "Tortie" && RNG.Next(5) == 0) // CONFIG - cat_generation.random_point_chance
                 Points = RNG.ChooseFrom(LooksGroups.PointMarkings);
 
             int[] Weights = { 10, 10, 10, 10, 1 };
@@ -325,7 +388,7 @@ namespace Clangen.Cats
             else if (Name == "Calico")
                 Weights = new int[5] { 0, 0, 20, 15, 1 };
 
-            switch (RNG.Next(5))
+            switch (RNG.ChooseFrom(Enumerable.Range(0, 5).ToArray(), Weights)) // TEMP
             {
                 case 0:
                     WhitePatches = RNG.ChooseFrom(LooksGroups.LittleWhite);
@@ -356,8 +419,9 @@ namespace Clangen.Cats
         public bool PatternColorInheritance(CRandom RNG, CatRef Parent1, CatRef Parent2)
         {
             Looks FirstLooks = Parent1.Value.Looks, SecondLooks = Parent2.Value.Looks;
-            string ChosenPelt, ChosenPeltColour, ChosenTortieBase = null;
-            int DirectInheritance = 10; // GAMECONFIGCHANCE
+            string ChosenPelt, ChosenTortieBase = null;
+            PeltColour ChosenPeltColour;
+            int DirectInheritance = 10; // CONFIG
 
             if (RNG.Chance(1 / DirectInheritance))
             {
@@ -393,7 +457,7 @@ namespace Clangen.Cats
                 Weights.All(X => X == 0) ? RNG.ChooseFrom(LooksGroups.PeltCategories) : RNG.ChooseFrom(LooksGroups.PeltCategories, Weights)
             );
 
-            int TortieChanceFemale = 3, TortieChanceMale = 13; // GAMECONFIGCHANCE
+            int TortieChanceFemale = 3, TortieChanceMale = 13; // CONFIG
 
             if (Array.IndexOf(LooksGroups.Tabbies, FirstLooks.Name) > -1)
                 TortieChanceFemale /= 2; TortieChanceMale -= 1;
@@ -462,13 +526,13 @@ namespace Clangen.Cats
         public void WhitePatchInheritance(CRandom RNG, CatRef Parent1, CatRef Parent2)
         {
             Looks FirstLooks = Parent1.Value.Looks, SecondLooks = Parent2.Value.Looks;
-            int DirectInheritance = 10; // GAMECONFIGCHANCE
+            int DirectInheritance = 10; // CONFIG
 
             List<string> ParentPoints = new List<string>();
             List<string> ParentWhitePatches = new List<string>();
 
-            if (FirstLooks.WhitePatches is not null) ParentPoints.Add(FirstLooks.WhitePatches); // TEMPORARY
-            if (SecondLooks.WhitePatches is not null) ParentPoints.Add(SecondLooks.WhitePatches); // TEMPORARY
+            if (FirstLooks.WhitePatches is not null) ParentPoints.Add(FirstLooks.WhitePatches); // TEMP
+            if (SecondLooks.WhitePatches is not null) ParentPoints.Add(SecondLooks.WhitePatches); // TEMP
 
             if (FirstLooks.Points is not null) ParentPoints.Add(FirstLooks.Points);
             if (SecondLooks.Points is not null) ParentPoints.Add(SecondLooks.Points);
@@ -542,7 +606,7 @@ namespace Clangen.Cats
             else if (Name == "Calico")
                 Weights = Weights[1] != 0 ? new int[5] { 2, 1, 0, 0, 0 } : new int[5] { Weights[0], Weights[1], 0, 0, 0 };
 
-            switch (RNG.Next(5))
+            switch (RNG.ChooseFrom(Enumerable.Range(0, 5).ToArray(), Weights))
             {
                 case 0:
                     WhitePatches = RNG.ChooseFrom(LooksGroups.LittleWhite);
@@ -570,23 +634,22 @@ namespace Clangen.Cats
 
 
 
-
         public void Expand()
         {
             Cat ThisCat = Source;
             CRandom RNG = new CRandom(ThisCat.Seed);
 
-            // InitPatternCOlor
+            // InitPatternColor
             bool PeltWhite = RandomizePatternColor(RNG);
 
             // InitWhitePatches
-            int VitiligoChance = 1 << 8; // GAMECONFIGCHANCE
+            int VitiligoChance = 1 << 8; // CONFIG
 
             if (RNG.Next(VitiligoChance) == 0)
                 Vitiligo = RNG.ChooseFrom(LooksGroups.Vitiligo);
 
             if (PeltWhite)
-                RandomizeWhitePatches(RNG, PeltWhite);
+                RandomizeWhitePatches(RNG);
 
             // InitSprite
             SpriteNewborn = SpriteType.Newborn;
@@ -614,7 +677,7 @@ namespace Clangen.Cats
             Reversed = RNG.Choose();
 
             // InitScars + InitAccessories
-            if (ThisCat.Age != Age.Newborn)
+            if (ThisCat.Age is not Age.Newborn)
             {
                 int ScarChance, AccessoryChance;
                 switch (ThisCat.Age)
@@ -640,11 +703,11 @@ namespace Clangen.Cats
             // InitEyes
             EyeColour = RNG.ChooseFrom(LooksGroups.EyeColours);
 
-            int BaseHeterochromia = 120; // GAMECONFIGCHANCE
+            int BaseHeterochromia = 120; // CONFIG
 
-            if (Colour == "White" || Array.IndexOf(LooksGroups.HighWhite, WhitePatches) > -1 || Array.IndexOf(LooksGroups.MostlyWhite, WhitePatches) > -1 || WhitePatches == "Fullwhite")
+            if (Colour is PeltColour.White || Array.IndexOf(LooksGroups.HighWhite, WhitePatches) > -1 || Array.IndexOf(LooksGroups.MostlyWhite, WhitePatches) > -1 || WhitePatches == "Fullwhite")
                 BaseHeterochromia -= 90;
-            if (Colour == "White" || WhitePatches == "Fullwhite")
+            if (Colour is PeltColour.White || WhitePatches == "Fullwhite")
                 BaseHeterochromia -= 10;
 
             if (RNG.Next(BaseHeterochromia < 0 ? 1 : BaseHeterochromia) == 0)
@@ -663,9 +726,9 @@ namespace Clangen.Cats
                 TortieBase ??= RNG.ChooseFrom(LooksGroups.TortieBases);
                 Pattern ??= RNG.ChooseFrom(LooksGroups.TortiePatterns);
 
-                int WildcardChance = 1 << 9; // GAMECONFIGCHANCE
+                int WildcardChance = 1 << 9; // CONFIG
 
-                if (Colour is not null)
+                if (Colour is not PeltColour.None)
                 {
                     if (WildcardChance == 0 || RNG.Next(WildcardChance) == 0)
                     {
@@ -683,10 +746,10 @@ namespace Clangen.Cats
                         else
                             TortiePattern = RNG.Chance(.97) ? TortieBase : "Single";
 
-                        if (Colour == "White")
+                        if (Colour is PeltColour.White)
                         {
                             var PossibleColours = LooksGroups.WhiteColours.ToList();
-                            PossibleColours.Remove("White");
+                            PossibleColours.Remove(PeltColour.White);
                             Colour = RNG.ChooseFrom(PossibleColours);
                         }
 
@@ -708,11 +771,11 @@ namespace Clangen.Cats
                             TortieColour = RNG.ChooseFrom(PossibleColours);
                         }
                         else
-                            TortieColour = "Golden";
+                            TortieColour = PeltColour.Golden;
                     }
                 }
                 else
-                    TortieColour = "Golden";
+                    TortieColour = PeltColour.Golden;
             }
 
             // InitTints
@@ -730,9 +793,9 @@ namespace Clangen.Cats
             {
                 Tints.WhitePatches.PossibleTints.TryGetValue("Basic", out BaseTints);
                 ColorTints = null;
-                if (Tints.WhitePatches.ColourGroups.ContainsKey(Colour)) // This is following old code, but I cannot tell if its intended to be from CatTint or WhitePatchesTint
+                if (Tints.WhitePatches.ColourGroups.TryGetValue(Colour, out string Value)) // This is following old code, but I cannot tell if its intended to be from CatTint or WhitePatchesTint
                 {
-                    ColorTints = Tints.WhitePatches.PossibleTints[Tints.WhitePatches.ColourGroups[Colour]];
+                    ColorTints = Tints.WhitePatches.PossibleTints[Value];
                 }
 
                 if (BaseTints is not null || ColorTints is not null)
@@ -750,7 +813,7 @@ namespace Clangen.Cats
             bool PeltWhite = PatternColorInheritance(RNG, FirstParent, SecondParent);
 
             // InitWhitePatches
-            int VitiligoChance = 1 << (8 + (FirstParent.Value.Looks.Vitiligo is null ? 0 : -1) + (SecondParent.Value.Looks.Vitiligo is null ? 0 : -1)); // GAMECONFIGCHANCE
+            int VitiligoChance = 1 << (8 + (FirstParent.Value.Looks.Vitiligo is null ? 0 : -1) + (SecondParent.Value.Looks.Vitiligo is null ? 0 : -1)); // CONFIG
 
             if (RNG.Next(VitiligoChance) == 0)
                 Vitiligo = RNG.ChooseFrom(LooksGroups.Vitiligo);
@@ -810,11 +873,11 @@ namespace Clangen.Cats
             // InitEyes
             EyeColour = RNG.Choose() ? RNG.ChooseFrom(LooksGroups.EyeColours) : (RNG.Choose() ? FirstLooks : SecondLooks).EyeColour;
 
-            int BaseHeterochromia = 120; // GAMECONFIGCHANCE
+            int BaseHeterochromia = 120; // CONFIG
 
-            if (Colour == "White" || Array.IndexOf(LooksGroups.HighWhite, WhitePatches) > -1 || Array.IndexOf(LooksGroups.MostlyWhite, WhitePatches) > -1 || WhitePatches == "Fullwhite")
+            if (Colour is PeltColour.White || Array.IndexOf(LooksGroups.HighWhite, WhitePatches) > -1 || Array.IndexOf(LooksGroups.MostlyWhite, WhitePatches) > -1 || WhitePatches == "Fullwhite")
                 BaseHeterochromia -= 90;
-            if (Colour == "White" || WhitePatches == "Fullwhite")
+            if (Colour is PeltColour.White || WhitePatches == "Fullwhite")
                 BaseHeterochromia -= 10;
 
             BaseHeterochromia += (FirstLooks.EyeColour2 is not null ? -10 : 0) + (SecondLooks.EyeColour2 is not null ? -10 : 0);
@@ -835,9 +898,9 @@ namespace Clangen.Cats
                 TortieBase ??= RNG.ChooseFrom(LooksGroups.TortieBases);
                 Pattern ??= RNG.ChooseFrom(LooksGroups.TortiePatterns);
 
-                int WildcardChance = 1 << 9; // GAMECONFIGCHANCE
+                int WildcardChance = 1 << 9; // CONFIG
 
-                if (Colour is not null)
+                if (Colour is not PeltColour.None)
                 {
                     if (WildcardChance == 0 || RNG.Next(WildcardChance) == 0)
                     {
@@ -855,10 +918,10 @@ namespace Clangen.Cats
                         else
                             TortiePattern = RNG.Chance(.97) ? TortieBase : "Single";
 
-                        if (Colour == "White")
+                        if (Colour is PeltColour.White)
                         {
                             var PossibleColours = LooksGroups.WhiteColours.ToList();
-                            PossibleColours.Remove("White");
+                            PossibleColours.Remove(PeltColour.White);
                             Colour = RNG.ChooseFrom(PossibleColours);
                         }
 
@@ -880,19 +943,19 @@ namespace Clangen.Cats
                             TortieColour = RNG.ChooseFrom(PossibleColours);
                         }
                         else
-                            TortieColour = "Golden";
+                            TortieColour = PeltColour.Golden;
                     }
                 }
                 else
-                    TortieColour = "Golden";
+                    TortieColour = PeltColour.Golden;
             }
 
             // InitTints
             Tints.PossibleTints.TryGetValue("Basic", out string[] BaseTints);
             string[] ColorTints = null;
-            if (Tints.ColourGroups.ContainsKey(Colour))
+            if (Tints.ColourGroups.TryGetValue(Colour, out var Value))
             {
-                ColorTints = Tints.PossibleTints[Tints.ColourGroups[Colour]];
+                ColorTints = Tints.PossibleTints[Value];
             }
 
             if (BaseTints is not null || ColorTints is not null)
@@ -912,6 +975,8 @@ namespace Clangen.Cats
             }
         }
 
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -925,31 +990,31 @@ namespace Clangen.Cats
         {
             Cat ThisCat = Source;
             Age Age = LifeState ?? ThisCat.Age;
-            bool Dead = IsAlwaysLiving ? false : ThisCat.Dead;
+            bool Dead = !IsAlwaysLiving && ThisCat.Dead;
 
             SpriteType CatSprite;
 
-            bool AllowSickSprites = true; // GAMECONFIGCHANCE
+            bool AllowSickSprites = true; // CONFIG
             bool AllCatsAreNewborn = false;
 
-            if (!IsAlwaysHealthy && !ThisCat.IsAbleToWork && Age != Age.Newborn && AllowSickSprites)
-                CatSprite = Age == Age.Kitten || Age == Age.Adolescent ? SpriteType.SickYoung : SpriteType.SickAdult;
+            if (!IsAlwaysHealthy && !ThisCat.IsAbleToWork && Age is not Age.Newborn && AllowSickSprites)
+                CatSprite = Age is Age.Kitten || Age is Age.Adolescent ? SpriteType.SickYoung : SpriteType.SickAdult;
             else if (!IsAlwaysHealthy && ThisCat.Looks.Paralyzed)
-                CatSprite = Age == Age.Kitten || Age == Age.Adolescent ? SpriteType.ParalyzedYoung : (ThisCat.Looks.Length == PeltLength.Long ? SpriteType.ParalyzedLong : SpriteType.ParalyzedShort);
+                CatSprite = Age is Age.Kitten || Age is Age.Adolescent ? SpriteType.ParalyzedYoung : (ThisCat.Looks.Length is PeltLength.Long ? SpriteType.ParalyzedLong : SpriteType.ParalyzedShort);
             else
                 CatSprite = AllCatsAreNewborn ? ThisCat.Looks.SpriteNewborn : ThisCat.Looks.GetSpriteType(Age);
 
-            Image Sprite = new Image(50, 50); // TEMPORARY
+            Image Sprite = new Image(50, 50, null, true); // TEMP
 
             using (var Target = new RenderTarget(Sprite))
             {
                 if (Name != "Tortie" && Name != "Calico")
                 {
-                    Context.Render(Context.Sprites[$"{GetSpritesName(Name)}.{Colour}.{CatSprite}"]);
+                    Context.Sprites.Render($"{GetSpritesName(Name)}.{Colour}.{CatSprite}");
                 }
                 else
                 {
-                    Context.Render(Context.Sprites[$"{GetSpritesName(TortieBase)}.{Colour}.{CatSprite}"]);
+                    Context.Sprites.Render($"{GetSpritesName(TortieBase)}.{Colour}.{CatSprite}");
 
                     Image Patches = Context.Sprites[$"{GetSpritesName(TortiePattern)}.{TortieColour}.{CatSprite}"];
                     Image TortieMask = Context.Sprites[$"TortieMask.{Pattern}.{CatSprite}"];
@@ -961,9 +1026,9 @@ namespace Clangen.Cats
                 }
 
                 // Applying Tint
-                if (Tint is not null && Tints.Colors.ContainsKey(Tint))
+                if (Tint is not null && Tints.Colors.TryGetValue(Tint, out Color Color))
                 {
-                    Image TintOverlay = new Image(50, 50, Tints.Colors[Tint]);
+                    Image TintOverlay = new Image(50, 50, Color);
                     TintOverlay.SetBlendmode(SDL_BlendMode.SDL_BLENDMODE_MUL);
                     Context.RenderOnto(TintOverlay, Sprite);
                 }
@@ -1004,7 +1069,7 @@ namespace Clangen.Cats
 
                 // Drawing vitiligo
                 if (Vitiligo is not null)
-                    Context.Render(Context.Sprites[$"WhitePatches.{Vitiligo}.{CatSprite}"]);
+                    Context.Sprites.Render($"WhitePatches.{Vitiligo}.{CatSprite}");
 
                 // Drawing eyes
                 Image EyesLayer = Context.Sprites[$"Eyes.{EyeColour}.{CatSprite}"];
@@ -1022,27 +1087,27 @@ namespace Clangen.Cats
                     var Scar = Scars[i];
 
                     if (LooksGroups.Scars.Contains(Scar) || LooksGroups.SpecialScars.Contains(Scar))
-                        Context.Render(Context.Sprites[$"Scars.{Scar}.{CatSprite}"]);
+                        Context.Sprites.Render($"Scars.{Scar}.{CatSprite}");
                 }
 
                 // Drawing lineart
-                if (true && !Dead) // TEMPORARY -> true is the bool value for ShadersOn settings
+                if (true && !Dead) // TEMP -> true is the bool value for ShadersOn settings
                 {
                     Image Shader = Context.Sprites[$"Shaders.{CatSprite}"];
                     Shader.SetBlendmode(SDL_BlendMode.SDL_BLENDMODE_MUL);
                     Context.Render(Shader);
-                    Context.Render(Context.Sprites[$"Lighting.{CatSprite}"]);
+                    Context.Sprites.Render($"Lighting.{CatSprite}");
                 }
 
                 if (!Dead)
-                    Context.Render(Context.Sprites[$"Lineart.{CatSprite}"]);
+                    Context.Sprites.Render($"Lineart.{CatSprite}");
                 else if (ThisCat.DarkForest)
-                    Context.Render(Context.Sprites[$"LineartDarkforest.{CatSprite}"]);
+                    Context.Sprites.Render($"LineartDarkforest.{CatSprite}");
                 else if (Dead)
-                    Context.Render(Context.Sprites[$"LineartDead.{CatSprite}"]);
+                    Context.Sprites.Render($"LineartDead.{CatSprite}", null);
 
                 // Drawing skin
-                Context.Render(Context.Sprites[$"Skin.{Skin}.{CatSprite}"]);
+                Context.Sprites.Render($"Skin.{Skin}.{CatSprite}");
 
                 // Drawing missing scars
                 for (int i = 0; i < Scars.Count; i++)
@@ -1058,10 +1123,13 @@ namespace Clangen.Cats
                 }
 
                 // Draw accessories
-                if (Array.IndexOf(LooksGroups.PlantAccessories, Accessory) > -1)
-                    Context.Render(Context.Sprites[$"MedcatHerbs.{Accessory}.{CatSprite}"]);
-                else if (Array.IndexOf(LooksGroups.Collars, Accessory) > -1)
-                    Context.Render(Context.Sprites[$"Collars.{Accessory}.{CatSprite}"]);
+                if (!HideAccessorys)
+                {
+                    if (Array.IndexOf(LooksGroups.PlantAccessories, Accessory) > -1)
+                        Context.Sprites.Render($"MedcatHerbs.{Accessory}.{CatSprite}");
+                    else if (Array.IndexOf(LooksGroups.Collars, Accessory) > -1)
+                        Context.Sprites.Render($"Collars.{Accessory}.{CatSprite}");
+                }
             }
 
             // Reverse the sprite
@@ -1073,10 +1141,27 @@ namespace Clangen.Cats
         }
 
 
-        public string GetDescription() // IMPLEMENT
+
+        public string GetDescription()
         {
             throw new NotImplementedException();
         }
+
+
+
+        public string GetShortDescription()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        public string GetDescriptionOfEyes()
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         /// <summary>
         /// Get the stored <see cref="SpriteType"/> Value that lines up with the given <see cref="Age"/> Value
@@ -1107,6 +1192,13 @@ namespace Clangen.Cats
             }
         }
 
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <returns></returns>
         public string GetSpritesName(string Value)
         {
             switch (Value)
@@ -1116,7 +1208,7 @@ namespace Clangen.Cats
                     return "Single";
                 case "Tortie":
                 case "Calico":
-                    return null; // TEMPORARY
+                    return null; // TEMP
                 default:
                     return Value;
             }

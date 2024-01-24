@@ -9,14 +9,14 @@ namespace Clangen.Cats
 {
     public class SpriteLoader
     {
-        private Dictionary<string, Spritesheet> Spritesheets;
+        private readonly Dictionary<string, Spritesheet> Spritesheets;
 
         public SpriteLoader()
         {
             Spritesheets = new Dictionary<string, Spritesheet>();
         }
 
-        internal void Load() // TEMPORARY UNTIL DYNAMICISMS ARE ADDED
+        internal void Load() // TEMP UNTIL DYNAMICISMS ARE ADDED
         {
             foreach (string Path in Directory.GetFiles("Common\\Sprites", "*.*", SearchOption.AllDirectories))
             {
@@ -561,7 +561,7 @@ namespace Clangen.Cats
                     case "MedcatHerbs":
                         CurrentSheet = Spritesheets["MedcatHerbs"] = new Spritesheet(Path);
 
-                        for (int i = 0; i < 0; i++)
+                        for (int i = 0; i < 21 * 22; i++)
                         {
                             string SpriteID;
                             int X, Y;
@@ -611,7 +611,7 @@ namespace Clangen.Cats
                     case "CollarsNylon":
                         CurrentSheet = Spritesheets[File] = new Spritesheet(Path);
 
-                        for (int i = 0; i < 0; i++)
+                        for (int i = 0; i < 21 * 15; i++)
                         {
                             string SpriteID;
                             int X, Y;
@@ -646,33 +646,6 @@ namespace Clangen.Cats
                         }
 
                         break;
-
-
-
-                    case "":
-                        CurrentSheet = Spritesheets[""] = new Spritesheet(Path);
-
-                        for (int i = 0; i < 0; i++)
-                        {
-                            string SpriteID;
-                            int X, Y;
-
-                            switch (i / 21)
-                            {
-                                default: SpriteID = ""; X = 0; Y = 0; break;
-                            }
-
-                            X *= 3;
-                            Y *= 7;
-                            SpriteID += ".";
-
-                            Group(i % 21, ref SpriteID, ref X, ref Y);
-
-                            CurrentSheet.Sprites[SpriteID] = new SDL_Rect() { x = X * 50, y = Y * 50, w = 50, h = 50 };
-                        }
-
-                        break;
-
 
 
                     default:
@@ -717,11 +690,21 @@ namespace Clangen.Cats
             {
                 List<string> Path = Identifier.Split('.').ToList();
                 string Root = Path[0];
-
                 Path.RemoveAt(0);
 
                 return Spritesheets[Root][string.Join(".", Path)];
             }
+        }
+
+        public void Render(string Identifier, SDL_Rect? Destination = null)
+        {
+            List<string> Path = Identifier.Split('.').ToList();
+            string Root = Path[0];
+            Path.RemoveAt(0);
+
+            Identifier = string.Join(".", Path);
+
+            Context.Render(Spritesheets[Root].TextureAtlas, Spritesheets[Root].Sprites[Identifier], Destination);
         }
     }
 
@@ -738,7 +721,7 @@ namespace Clangen.Cats
             SpriteSize = (short)Size;
         }
 
-        public Image this[string Identifer] // TEMPORARY (need to measure whats better -> holding individual images or the spritesheets and blitting them onto images when needed)
+        public Image this[string Identifer] // TEMP (need to measure whats better -> holding individual images or the spritesheets and blitting them onto images when needed)
         {
             get
             {
